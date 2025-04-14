@@ -22,6 +22,9 @@ interface CompanyOption {
 
 const DEFAULT_STORAGE_KEY = "pinnedCompanies"
 
+// Define backend API URL from environment variable or fallback for local dev
+const backendApiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '/api';
+
 // Memoize the component to prevent unnecessary re-renders
 export const CompanySelector = memo(function CompanySelector({
   onChange,
@@ -46,7 +49,7 @@ export const CompanySelector = memo(function CompanySelector({
       setIsLoading(true)
       setError(null)
       try {
-        const response = await fetch("/api/companies")
+        const response = await fetch(`${backendApiUrl}/companies`)
         if (!response.ok) {
           throw new Error(`Failed to fetch companies: ${response.statusText}`)
         }

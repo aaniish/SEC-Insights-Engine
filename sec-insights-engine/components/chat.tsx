@@ -11,6 +11,9 @@ import type { Citation, SecResponse } from "@/lib/types"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 
+// Define backend API URL from environment variable or fallback for local dev
+const backendApiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '/api';
+
 // Define message structure for frontend state
 interface Message {
   id: string
@@ -204,7 +207,7 @@ export function Chat({ selectedCompanies, onCompaniesChange }: ChatProps) {
       // Retry loop
       while (retries <= maxRetries) {
         try {
-          response = await fetch("/api/query", {
+          response = await fetch(`${backendApiUrl}/query`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

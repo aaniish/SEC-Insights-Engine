@@ -94,9 +94,43 @@ SEC Insights Engine is a sophisticated Retrieval Augmented Generation (RAG) appl
 
 ## Architecture
 
-![SEC Insights Engine Architecture](architecture-diagram.png)
-
-*Note: Please replace with actual architecture diagram before submission*
+```
+                                  ┌───────────────────────────────────────────┐
+                                  │                                           │
+                                  │         SEC Insights Engine Frontend      │
+                                  │         (Next.js Application)             │
+                                  │                                           │
+                                  └───────────────┬───────────────────────────┘
+                                                  │
+                                                  │ HTTP/REST API
+                                                  │
+                                  ┌───────────────▼───────────────────────────┐
+                                  │                                           │
+                                  │         SEC Insights Backend              │
+                                  │         (FastAPI Application)             │
+                                  │                                           │
+                                  └───┬────────────────┬────────────┬─────────┘
+                                      │                │            │
+              ┌─────────────────────┐ │                │            │ ┌──────────────────────┐
+              │                     ◄─┘                │            └─►                      │
+              │  Vector Store       │                  │              │  SEC Agent           │
+              │  (ChromaDB)         │                  │              │  (LangChain Agent)   │
+              │                     │                  │              │                      │
+              └─────────────────────┘                  │              └──────────────────────┘
+                                                       │
+                                      ┌────────────────▼───────────────┐
+                                      │                                │
+                                      │  RAG Pipeline                  │
+                                      │                                │
+                                      └────────────────┬───────────────┘
+                                                       │
+┌────────────────────────────┐         ┌──────────────▼────────────────┐
+│                            │         │                               │
+│  SEC Data Ingestion        ├────────►│  SEC Documents                │
+│  (ETL Process)             │         │  (10-K & 10-Q Filings)        │
+│                            │         │                               │
+└────────────────────────────┘         └───────────────────────────────┘
+```
 
 The application follows a modern architecture with three main components:
 
@@ -117,31 +151,46 @@ The application follows a modern architecture with three main components:
    - Document embeddings for semantic search
    - Metadata storage for document context
 
-### RAG Implementation Details
+### Key Components
 
-The RAG system works in several stages:
+#### Frontend Layer
+- **SEC Insights Engine Frontend**: Single-page application built with Next.js
+  - `Chat`: Main interface for user interactions
+  - `ChatMessage`: Renders chat messages with citations
+  - `CompanySelector`: Allows users to select companies for analysis
+  - `Sidebar`: Navigation and layout structure
 
-1. **Data Ingestion**
-   - Downloads SEC filings (10-K, 10-Q) using SEC Edgar API
-   - Extracts key sections (Risk Factors, MD&A)
-   - Processes and cleans the text
+#### Backend Layer
+- **SEC Insights Backend**: REST API service using FastAPI
+  - Exposes endpoints for queries and company listings
+  - Manages connections to vector database and AI services
 
-2. **Chunking and Embedding**
-   - Splits documents into semantic chunks
-   - Generates vector embeddings for each chunk
-   - Stores chunks with metadata in vector database
+- **RAG Pipeline**: Core retrieval-augmented generation pipeline
+  - Retrieves relevant document chunks based on queries
+  - Generates answers with citations
+  - Provides suggested follow-up queries based on context
 
-3. **Retrieval**
-   - Processes user queries
-   - Performs semantic search to find relevant chunks
-   - Filters by company when specified
-   - Ranks results by relevance
+- **Vector Store**: ChromaDB implementation for semantic search
+  - Stores document embeddings and metadata
+  - Enables efficient similarity search for document retrieval
 
-4. **Generation**
-   - Constructs prompt with retrieved context
-   - Generates coherent response using OpenAI GPT models
-   - Includes citations and source information
-   - Suggests related follow-up queries
+- **SEC Agent**: LangChain-based agent for complex queries
+  - Implements specialized tools for financial document analysis:
+    - SECSectionRetriever: Fetches relevant SEC filing sections
+    - LLMSummarizer: Summarizes retrieved text
+    - LLMComparer: Compares information between companies
+    - FinancialDataExtractor: Extracts financial metrics
+    - TrendCalculator: Analyzes trend data
+
+#### Data Layer
+- **SEC Data Ingestion**: ETL process to download and process SEC filings
+  - Downloads filings via SEC Edgar API
+  - Extracts relevant sections (Risk Factors, MD&A)
+  - Chunks and processes text for vector storage
+
+- **SEC Documents**: Raw and processed SEC filings
+  - Stored in persistent volumes
+  - Organized by company, filing type, and accession number
 
 ## Setup
 

@@ -302,7 +302,7 @@ class SECAgent:
             query: The natural language query to process
             companies: A list of company tickers to focus on
             chat_history: Optional list of previous messages for context
-        
+            
         Returns:
             SecResponse with the agent's answer, citations, and follow-up suggestions
         """
