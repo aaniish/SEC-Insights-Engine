@@ -256,7 +256,9 @@ Before you can use the application effectively, you need to ingest SEC filings d
 
 ## Demo Video
 
-A ~2 minute video demonstration of the SEC Insights Engine is available at [link to video]. 
+A demonstration of the SEC Insights Engine is available here:
+
+[![SEC Insights Engine Demo](https://img.youtube.com/vi/KYFof-RJxCQ/0.jpg)](https://youtu.be/KYFof-RJxCQ)
 
 The demo showcases:
 - Application overview and UI walkthrough
