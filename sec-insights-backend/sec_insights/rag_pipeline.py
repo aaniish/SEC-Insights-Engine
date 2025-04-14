@@ -140,7 +140,26 @@ class RAGPipeline:
         Handles chat history for both routes.
         """
         print(f"Processing query: '{query}' for companies: {companies}")
+        
+        # Format chat history for LangChain components
         formatted_chat_history = self._format_history_for_chain(chat_history)
+        
+        # Keep the original format for other components that expect dict-like objects
+        dict_chat_history = []
+        if chat_history:
+            for msg in chat_history:
+                if hasattr(msg, 'model_dump'):
+                    # Pydantic model
+                    dict_chat_history.append(msg.model_dump())
+                elif hasattr(msg, '__dict__'):
+                    # Object with attributes
+                    dict_chat_history.append({
+                        "role": msg.role,
+                        "content": msg.content
+                    })
+                else:
+                    # Already a dict
+                    dict_chat_history.append(msg)
 
         if self._should_route_to_agent(query, companies):
             # Route to Agent
@@ -162,7 +181,7 @@ class RAGPipeline:
             if not retrieved_docs:
                 return SecResponse(answer="Could not find relevant information in the available filings for this specific query.", citations=[])
 
-            # Invoke RAG chain - Pass the combined input dictionary
+            # Invoke RAG chain - Pass the combined input dictionary with formatted chat history
             chain_input = {
                 "question": query,
                 "companies": companies,
@@ -173,12 +192,13 @@ class RAGPipeline:
             # Extract citations using the retrieved documents
             citations = self._extract_rag_citations(retrieved_docs)
 
-            # Generate contextually relevant suggested queries
+            # Generate contextually relevant suggested queries with dict-format chat history
             suggested_queries = await self._generate_suggested_queries(
                 query=query, 
                 answer=answer, 
                 companies=companies, 
-                retrieved_docs=retrieved_docs
+                retrieved_docs=retrieved_docs,
+                chat_history=dict_chat_history
             )
 
             return SecResponse(
@@ -188,12 +208,14 @@ class RAGPipeline:
             )
         except Exception as e:
             print(f"Error in RAG chain: {e}")
+            import traceback
+            traceback.print_exc()
             raise HTTPException(status_code=500, detail=f"RAG processing failed: {e}")
 
-    async def _generate_suggested_queries(self, query: str, answer: str, companies: List[str], retrieved_docs: List[Dict[str, Any]]) -> List[str]:
+    async def _generate_suggested_queries(self, query: str, answer: str, companies: List[str], retrieved_docs: List[Dict[str, Any]], chat_history: Optional[List[Dict[str, str]]] = None) -> List[str]:
         """
         Generate contextually relevant suggested follow-up queries based on the 
-        current query, answer, and retrieved documents.
+        current query, answer, retrieved documents, and past conversation history.
         """
         import random
         from collections import Counter
@@ -267,6 +289,54 @@ class RAGPipeline:
                 except:
                     pass
         
+        # Analyze chat history to identify user interests and avoid repetition
+        historical_topics = set()
+        discussed_companies = set()
+        discussed_sections = set()
+        previously_asked_questions = set()
+        
+        if chat_history:
+            # Process up to 10 most recent messages to identify patterns
+            recent_messages = chat_history[-10:] if len(chat_history) > 10 else chat_history
+            
+            for message in recent_messages:
+                # Handle both dict-like objects and LangChain Message objects
+                if hasattr(message, 'get'):
+                    # Dict-like object
+                    role = message.get("role", "")
+                    content = message.get("content", "")
+                elif hasattr(message, 'role') and hasattr(message, 'content'):
+                    # LangChain Message object
+                    role = message.role
+                    content = message.content
+                else:
+                    continue
+                
+                if role == "user":
+                    user_text = content.lower()
+                    previously_asked_questions.add(user_text)
+                    
+                    # Extract companies from user messages
+                    for company_name in ["apple", "microsoft", "amazon", "google", "meta", "facebook"]:
+                        if company_name in user_text:
+                            discussed_companies.add(company_name.upper())
+                    
+                    for ticker in ["AAPL", "MSFT", "AMZN", "GOOGL", "META"]:
+                        if ticker.lower() in user_text:
+                            discussed_companies.add(ticker)
+                    
+                    # Extract topics from user messages
+                    for topic, keywords in topic_keywords.items():
+                        for keyword in keywords:
+                            if keyword in user_text:
+                                historical_topics.add(topic)
+                                break
+                    
+                    # Extract sections from user messages
+                    for section in ["risk factors", "management discussion", "md&a", "business"]:
+                        if section in user_text:
+                            discussed_sections.add(section.upper())
+        
         # Pattern detection in query
         query_patterns = {
             'comparison': any(term in query.lower() for term in ['compare', 'vs', 'versus', 'difference between']),
@@ -280,6 +350,9 @@ class RAGPipeline:
         target_companies = companies or list(detected_companies)
         if not target_companies and random.random() < 0.7:  # 70% chance to add a company if none detected
             potential_companies = ["AAPL", "MSFT", "GOOGL", "AMZN", "META"]
+            # Prioritize companies mentioned in chat history
+            if discussed_companies:
+                potential_companies = list(discussed_companies)
             target_companies = [random.choice(potential_companies)]
         
         # Base suggestions on detected patterns
@@ -289,6 +362,16 @@ class RAGPipeline:
         if query_patterns['comparison'] and len(target_companies) >= 2:
             aspects = ["revenue growth", "profit margins", "business strategy", 
                       "research and development investments", "market position"]
+            
+            # Prioritize aspects related to historical topics
+            if historical_topics:
+                if "financial" in historical_topics or "revenue" in historical_topics:
+                    aspects = ["revenue growth", "profit margins", "operating expenses", "gross margin", "cash flow"]
+                elif "innovation" in historical_topics or "products" in historical_topics:
+                    aspects = ["product portfolio", "R&D investments", "patent filings", "innovation strategy", "technology adoption"]
+                elif "risks" in historical_topics:
+                    aspects = ["risk factors", "regulatory challenges", "market uncertainties", "competitive threats", "supply chain risks"]
+            
             aspect = random.choice(aspects)
             companies_str = " and ".join(target_companies[:2])
             suggestions.append(f"How do {companies_str} compare in terms of {aspect}?")
@@ -306,19 +389,26 @@ class RAGPipeline:
             if target_companies:
                 company = target_companies[0]
                 metrics = ["revenue", "profit margin", "market share", "R&D spending", "employee headcount"]
+                
+                # Customize metrics based on historical interests
+                if "financial" in historical_topics:
+                    metrics = ["revenue", "profit margin", "cash flow", "debt ratio", "gross margin"]
+                elif "growth" in historical_topics:
+                    metrics = ["year-over-year growth", "customer acquisition", "market expansion", "product line growth", "international revenue"]
+                
                 metric = random.choice(metrics)
                 suggestions.append(f"What has been the trend in {company}'s {metric} over the past 3 years?")
         
-        # Add section-specific questions
-        if 'Risk Factors' in sections and len(suggestions) < 3:
+        # Add section-specific questions that haven't been discussed yet
+        if 'Risk Factors' in sections and 'RISK FACTORS' not in discussed_sections and len(suggestions) < 3:
             company_ref = target_companies[0] if target_companies else "the company"
             suggestions.append(f"What strategies does {company_ref} have to mitigate these risks?")
         
-        if 'MD&A' in sections and len(suggestions) < 3:
+        if 'MD&A' in sections and 'MD&A' not in discussed_sections and len(suggestions) < 3:
             company_ref = target_companies[0] if target_companies else "the company"
             suggestions.append(f"What does management say about future growth opportunities for {company_ref}?")
         
-        # Add topic-based suggestions
+        # Add topic-based suggestions, prioritizing topics that match user's interests
         topic_to_question = {
             'revenue': "What are the main sources of revenue?",
             'products': "What new products or services are being developed?",
@@ -331,28 +421,63 @@ class RAGPipeline:
             'outlook': "What is the company's guidance for the next fiscal year?"
         }
         
+        # First prioritize topics from user's history that are also in the current context
+        priority_topics = [topic for topic in historical_topics if topic in detected_topics]
+        
+        # Then add other detected topics
+        remaining_topics = [topic for topic in detected_topics if topic not in priority_topics]
+        
+        # Combine the lists with priority topics first
+        prioritized_topics = priority_topics + remaining_topics
+        
         # Add up to 2 topic-based questions
         added_topics = set()
-        for topic in random.sample(detected_topics, min(len(detected_topics), 4)):
+        for topic in prioritized_topics:
             if len(suggestions) >= 3:
                 break
             
             if topic in topic_to_question and topic not in added_topics:
                 company_ref = target_companies[0] if target_companies else "the company"
-                suggestions.append(f"{topic_to_question[topic].replace('the company', company_ref)}")
-                added_topics.add(topic)
+                question = topic_to_question[topic].replace('the company', company_ref)
+                
+                # Check that we're not repeating a previously asked question
+                is_duplicate = False
+                for prev_question in previously_asked_questions:
+                    if question.lower() in prev_question or prev_question in question.lower():
+                        is_duplicate = True
+                        break
+                
+                if not is_duplicate:
+                    suggestions.append(question)
+                    added_topics.add(topic)
         
         # Add a comparison question if we have only one company
         if len(target_companies) == 1 and len(suggestions) < 3 and not query_patterns['comparison']:
             other_companies = ["AAPL", "MSFT", "GOOGL", "AMZN", "META"]
             if target_companies[0] in other_companies:
                 other_companies.remove(target_companies[0])
-            compare_company = random.choice(other_companies)
+            
+            # Prioritize companies from chat history for comparison
+            comparison_candidates = [comp for comp in other_companies if comp in discussed_companies]
+            if not comparison_candidates:
+                comparison_candidates = other_companies
+            
+            compare_company = random.choice(comparison_candidates)
             
             # Pick a basis for comparison
             comparison_bases = ["business model", "growth strategy", "financial performance", "market position"]
-            if detected_topics:
-                # Try to base comparison on a detected topic
+            
+            # Prioritize topics from historical interests
+            if historical_topics:
+                if "financial" in historical_topics:
+                    comparison_bases = ["revenue growth", "profit margins", "financial health", "cash flow management"]
+                elif "strategy" in historical_topics:
+                    comparison_bases = ["growth strategy", "market expansion plans", "competitive positioning", "business model"]
+                elif "innovation" in historical_topics:
+                    comparison_bases = ["R&D investments", "innovation pipeline", "technology adoption", "patent portfolio"]
+            
+            # Then use detected topics as fallback
+            elif detected_topics:
                 if 'revenue' in detected_topics:
                     comparison_basis = "revenue sources"
                 elif 'innovation' in detected_topics:
@@ -364,7 +489,17 @@ class RAGPipeline:
             else:
                 comparison_basis = random.choice(comparison_bases)
             
-            suggestions.append(f"How does {target_companies[0]} compare to {compare_company} in terms of {comparison_basis}?")
+            comparison_question = f"How does {target_companies[0]} compare to {compare_company} in terms of {comparison_basis}?"
+            
+            # Check this isn't too similar to a previous question
+            is_duplicate = False
+            for prev_question in previously_asked_questions:
+                if "compare" in prev_question and target_companies[0].lower() in prev_question and compare_company.lower() in prev_question:
+                    is_duplicate = True
+                    break
+            
+            if not is_duplicate:
+                suggestions.append(comparison_question)
         
         # If we still need more suggestions, add generic but useful questions
         if len(suggestions) < 2:
@@ -376,8 +511,20 @@ class RAGPipeline:
                 "How has the company's market position changed in recent years?"
             ]
             
-            while len(suggestions) < 3 and generic_questions:
-                question = generic_questions.pop(random.randrange(len(generic_questions)))
+            # Filter out questions that are too similar to previous ones
+            filtered_questions = []
+            for question in generic_questions:
+                is_duplicate = False
+                for prev_question in previously_asked_questions:
+                    if question.lower() in prev_question or prev_question in question.lower():
+                        is_duplicate = True
+                        break
+                
+                if not is_duplicate:
+                    filtered_questions.append(question)
+            
+            while len(suggestions) < 3 and filtered_questions:
+                question = filtered_questions.pop(random.randrange(len(filtered_questions)))
                 if target_companies:
                     company_ref = target_companies[0]
                     question = question.replace("the company", company_ref)
@@ -385,4 +532,28 @@ class RAGPipeline:
         
         # Ensure all suggestions are unique and we have at most 3
         suggestions = list(dict.fromkeys(suggestions))  # Remove duplicates while preserving order
+        
+        if historical_topics:
+            # Add personalized queries based on historical interests
+            if "financial" in historical_topics and "growth" in detected_topics:
+                if target_companies:
+                    company_ref = target_companies[0]
+                    growth_query = f"What financial metrics show {company_ref}'s strongest growth areas?"
+                    if not any(growth_query.lower() in q.lower() for q in suggestions):
+                        suggestions.append(growth_query)
+            
+            if "risk" in historical_topics and len(suggestions) < 3:
+                if target_companies:
+                    company_ref = target_companies[0]
+                    risk_query = f"How has {company_ref}'s risk profile changed since their previous filing?"
+                    if not any(risk_query.lower() in q.lower() for q in suggestions):
+                        suggestions.append(risk_query)
+                
+            if "strategy" in historical_topics and len(suggestions) < 3:
+                if target_companies:
+                    company_ref = target_companies[0]
+                    strategy_query = f"What long-term strategic initiatives is {company_ref} investing in?"
+                    if not any(strategy_query.lower() in q.lower() for q in suggestions):
+                        suggestions.append(strategy_query)
+        
         return suggestions[:3]

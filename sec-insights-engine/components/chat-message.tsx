@@ -164,19 +164,24 @@ export const ChatMessage = memo(function ChatMessage({ message, onSuggestedQuery
         )}
 
         {!isLoading && message.suggestedQueries && message.suggestedQueries.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-2">
-            {message.suggestedQueries.map((query, i) => (
-              <Button
-                key={i}
-                variant="outline"
-                size="sm"
-                className="text-xs h-auto py-1 px-2 font-serif"
-                onClick={() => onSuggestedQueryClick?.(query)}
-                disabled={!onSuggestedQueryClick}
-              >
-                {query}
-              </Button>
-            ))}
+          <div className="pt-3 pb-1 mt-2 bg-muted/30 rounded-lg p-3 border border-muted">
+            <div className="flex items-center mb-2">
+              <div className="bg-primary/10 text-primary text-[10px] uppercase tracking-wider font-bold py-1 px-2 rounded font-sans">Suggested Questions</div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {message.suggestedQueries.map((query, i) => (
+                <Button
+                  key={i}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-auto py-2 px-3 border-primary/30 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-colors font-serif text-primary"
+                  onClick={() => onSuggestedQueryClick?.(query)}
+                  disabled={!onSuggestedQueryClick}
+                >
+                  {query}
+                </Button>
+              ))}
+            </div>
           </div>
         )}
       </div>

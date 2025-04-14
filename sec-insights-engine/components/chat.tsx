@@ -166,10 +166,18 @@ export function Chat({ selectedCompanies, onCompaniesChange }: ChatProps) {
     // Prepare history for API (limit length if needed)
     const chatHistory = messages
       .filter((msg) => !msg.isLoading) // Filter out any loading messages
+      .slice(-10) // Limit to last 10 messages to keep context relevant
       .map((msg: Message) => ({
         role: msg.role,
         content: msg.content.replace(/\(Companies selected:.*?\)/, '').trim(), // Remove company selection text for API
       }))
+
+    // Add query specific data to help with suggested queries
+    const queryMetadata = {
+      current_query: currentQuery,
+      selected_companies: selectedCompanies,
+      chat_history: chatHistory
+    }
 
     try {
       // Detect if this is likely a complex query that needs the agent
