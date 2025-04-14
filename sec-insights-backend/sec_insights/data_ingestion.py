@@ -1,7 +1,7 @@
 import os
 import re
 from typing import List, Dict, Any, Optional, Tuple
-from sec_downloader import Downloader
+from sec_edgar_downloader import Downloader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import logging
 import requests
@@ -144,7 +144,7 @@ class SECDataIngestion:
 
     def _find_filing_path(self, ticker: str, filing_type: str, accession_number: str) -> Optional[str]:
         """Finds the path to the primary HTML document of a downloaded filing."""
-        base_path = os.path.join(self.download_path, "sec-edgar-filings", ticker.upper(), filing_type)
+        base_path = os.path.join("/app", "sec-edgar-filings", ticker.upper(), filing_type)
         doc_path = os.path.join(base_path, accession_number) # Use accession number with hyphens
 
         if not os.path.exists(doc_path):
@@ -208,6 +208,14 @@ class SECDataIngestion:
         """
         filing_path = self._find_filing_path(ticker, filing_type, accession_number)
         if not filing_path:
+            logging.error(f"Filing path not found for {ticker}/{filing_type}/{accession_number}")
+            # Print detailed path information for debugging
+            base_path = os.path.join("/app", "sec-edgar-filings", ticker.upper(), filing_type)
+            doc_path = os.path.join(base_path, accession_number)
+            logging.error(f"Expected path: {doc_path}")
+            logging.error(f"Base path exists: {os.path.exists(base_path)}")
+            if os.path.exists(base_path):
+                logging.error(f"Contents of base path: {os.listdir(base_path)}")
             return []
 
         logging.info(f"Found filing document at: {filing_path}")
@@ -215,17 +223,37 @@ class SECDataIngestion:
         # Convert local path to SEC.gov URL for the API
         sec_url = self._convert_local_path_to_sec_url(filing_path, accession_number, ticker)
         
-        # Extract sections using SEC API
+        # Check if we have API access
+        has_api_access = self.sec_api.api_key is not None
+        
+        # Log info about what we're doing
+        logging.info(f"TARGET_SECTIONS to extract: {TARGET_SECTIONS}")
+        logging.info(f"File size: {os.path.getsize(filing_path)} bytes")
+        
+        # Extract sections using SEC API or fallback to direct file reading
         extracted_sections = {}
-        for section_id, section_name in TARGET_SECTIONS.items():
-            logging.info(f"Extracting section {section_id} ({section_name}) from {sec_url}")
-            section_text = self.sec_api.get_section(sec_url, section_id)
-            
-            if section_text:
-                logging.info(f"Successfully extracted section {section_id} ({section_name}). Length: {len(section_text)} chars")
-                extracted_sections[section_name] = section_text
-            else:
-                logging.warning(f"Failed to extract section {section_id} ({section_name}) or section is empty")
+        
+        if has_api_access:
+            for section_id, section_name in TARGET_SECTIONS.items():
+                logging.info(f"Extracting section {section_id} ({section_name}) from {sec_url}")
+                section_text = self.sec_api.get_section(sec_url, section_id)
+                
+                if section_text:
+                    logging.info(f"Successfully extracted section {section_id} ({section_name}). Length: {len(section_text)} chars")
+                    extracted_sections[section_name] = section_text
+                else:
+                    logging.warning(f"Failed to extract section {section_id} ({section_name}) or section is empty")
+        else:
+            # Fallback to direct file reading if we don't have API access
+            logging.warning("No SEC API key provided, falling back to direct file reading")
+            try:
+                with open(filing_path, 'r', encoding='utf-8', errors='replace') as f:
+                    content = f.read()
+                    
+                extracted_sections["Full Document"] = content
+                logging.info(f"Read full document content, length: {len(content)} chars")
+            except Exception as e:
+                logging.error(f"Error reading file directly: {e}")
         
         # Chunk sections
         all_chunks = []
@@ -238,8 +266,8 @@ class SECDataIngestion:
             for i, chunk_text in enumerate(chunks):
                  chunk_metadata = {
                      "company": company_name or ticker,
-                "ticker": ticker,
-                "filing_type": filing_type,
+                     "ticker": ticker,
+                     "filing_type": filing_type,
                      "date": filing_date or "Unknown",
                      "accession_number": accession_number,
                      "section": section_key, # Use the proper section name

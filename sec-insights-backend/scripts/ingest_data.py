@@ -43,7 +43,8 @@ LIMIT_PER_FILING_TYPE = 2 # Number of recent filings to download per type
 async def get_filing_metadata(download_dir: str, ticker: str, filing_type: str) -> List[Dict[str, str]]:
     """Gets accession numbers by listing directories within the base filing type folder."""
     metadata_list = []
-    expected_base_dir = os.path.join(download_dir, "sec-edgar-filings", ticker.upper(), filing_type)
+    # Change the expected base directory to match where files are actually saved
+    expected_base_dir = os.path.join("/app", "sec-edgar-filings", ticker.upper(), filing_type)
     logging.info(f"Looking for accession number directories inside: {expected_base_dir}")
 
     if os.path.exists(expected_base_dir):
