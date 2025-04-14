@@ -1,0 +1,21 @@
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.4.2
+chromadb==0.4.18
+beautifulsoup4==4.12.2
+requests==2.31.0
+# langchain==0.0.335 # Unpin base langchain version
+langchain
+# openai==1.3.5 # Unpin version to resolve conflict
+openai
+python-dotenv==1.0.0
+langchain-openai
+sentence-transformers
+sec-edgar-downloader
+langchain-text-splitters
+langchainhub
+langfuse
+# sec-parser  # Removing as we now use sec-api instead
+sec_downloader
+# Added for SEC API integration
+sec-api

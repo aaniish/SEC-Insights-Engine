@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./sec-insights-backend
+      dockerfile: Dockerfile
+    container_name: sec-insights-backend
+    restart: unless-stopped
+    env_file:
+      - .env # Load variables from .env file in the root directory
+    volumes:
+      - chroma_data:/app/chroma_db # Persist ChromaDB data
+      - sec_filings_data:/app/sec_filings_download # Persist downloaded filings
+    ports:
+      - "8000:8000" # Map host port 8000 to container port 8000
+    environment:
+      # Ensure backend uses the correct paths inside the container for volumes
+      # These might need adjustment based on how VectorStore/DataIngestion use paths
+      # Example: Override paths if they are configurable via env vars in Python code
+      # CHROMA_DB_PATH: /app/chroma_db 
+      # DOWNLOAD_PATH: /app/sec_filings_download
+      # Pass necessary API keys (loaded from .env via env_file)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
+      - SEC_EMAIL_ADDRESS=${SEC_EMAIL_ADDRESS}
+    networks:
+      - secinsights_network
+
+  frontend:
+    build:
+      context: ./sec-insights-engine
+      dockerfile: Dockerfile
+    container_name: sec-insights-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000" # Map host port 3000 to container port 3000
+    depends_on:
+      - backend # Wait for backend to be healthy (optional, basic dependency)
+    environment:
+      # Next.js doesn't need backend API keys directly
+      # The API calls are proxied internally by the container's Next.js server
+      # to the backend container via the network defined below.
+      # The rewrite rule in next.config.mjs needs updating for Docker networking.
+      # Alternatively, use NEXT_PUBLIC_ variables if needed client-side (not recommended for secrets)
+      NODE_ENV: production
+    networks:
+      - secinsights_network
+
+networks:
+  secinsights_network:
+    driver: bridge
+
+volumes:
+  chroma_data:
+    driver: local # Or configure external storage
+  sec_filings_data:
+    driver: local # Or configure external storage 
