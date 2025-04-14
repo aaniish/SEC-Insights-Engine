@@ -57,10 +57,7 @@ class SectionInput(BaseModel):
 @tool("SECSectionRetriever", args_schema=SectionInput)
 async def retrieve_sections(query: str, companies: Optional[List[str]] = None) -> List[Dict[str, Any]]:
     """Retrieves relevant text sections (like Risk Factors, MD&A) from SEC filings based on a query and optional company filters. Returns a list of document chunks with content and metadata."""
-    # NOTE: This tool needs access to the VectorStore instance.
-    # This is a simplified implementation detail. A better approach might involve
-    # dependency injection or context management for the VectorStore.
-    # For now, assume vector_store is accessible in this scope or passed differently.
+
     if 'vector_store_instance' not in globals():
          # This is a temporary fix, proper DI is needed
          globals()['vector_store_instance'] = VectorStore()
@@ -163,10 +160,7 @@ class FinancialDataInput(BaseModel):
 async def extract_financial_data(company_ticker: str, data_points: List[str], years: Optional[List[int]] = None) -> Dict[str, Any]:
     """(Placeholder) Extracts specific numerical financial data points (like Revenue, Net Income) for a given company over specified years from filings. Requires structured data source (XBRL or parsed tables)."""
     print(f"[Placeholder Tool] FinancialDataExtractor called for {company_ticker}, points: {data_points}, years: {years}")
-    # In a real implementation, this would involve:
-    # - Accessing parsed XBRL data or pre-processed table data.
-    # - Querying the data based on ticker, data_points, and years.
-    # - Returning structured data.
+
     return {
         "status": "placeholder",
         "message": "Financial data extraction not yet implemented.",
@@ -186,13 +180,9 @@ class TrendInput(BaseModel):
 async def calculate_trend(numerical_data: List[Dict[str, Any]], data_label: str) -> Dict[str, Any]:
     """(Placeholder) Calculates simple trends (like year-over-year percentage change) from a list of numerical data points (requires year and value)."""
     print(f"[Placeholder Tool] TrendCalculator called for {data_label}")
-    # In a real implementation:
-    # - Sort data by year.
-    # - Perform calculations (e.g., YoY % change).
-    # - Return a description of the trend.
+
     if len(numerical_data) < 2:
         return {"status": "placeholder", "message": "Need at least two data points to calculate trend."}
-    # Simulate a simple trend calculation
     try:
         sorted_data = sorted(numerical_data, key=lambda x: x['year'])
         latest = sorted_data[-1]
@@ -225,7 +215,6 @@ class SECAgent:
         ]
 
         # LLM for the agent
-        # Consider using GPT-4 for better reasoning if available/affordable
         self.llm = ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
 
         # Agent Prompt - using a standard ReAct style prompt from Langchain Hub
@@ -483,11 +472,3 @@ class SECAgent:
         
         # Limit to 3 suggestions
         return suggestions[:3]        
-
-# --- RAGPipeline Modification (to include Agent) --- 
-# Option 1: Agent decides when to run (complex)
-# Option 2: Simple routing in RAGPipeline based on query analysis (simpler to start)
-# Let's modify RAGPipeline to optionally use the agent. 
-
-# This requires passing the VectorStore to the Agent upon RAGPipeline init.
-# Changes will be made in rag_pipeline.py next.

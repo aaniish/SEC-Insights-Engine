@@ -158,12 +158,8 @@ class RAGPipeline:
         # Default to RAG Chain
         print("--- Routing to RAG Chain ---")
         try:
-            # Need retrieved docs for citations
-            # The retrieval context doesn't use history directly, but the LLM call does
             retrieved_docs = await self.vector_store.search(query=query, companies=companies, limit=3)
             if not retrieved_docs:
-                # Check history? Or just return no info?
-                # For now, stick to returning based on retrieved docs.
                 return SecResponse(answer="Could not find relevant information in the available filings for this specific query.", citations=[])
 
             # Invoke RAG chain - Pass the combined input dictionary
@@ -390,6 +386,3 @@ class RAGPipeline:
         # Ensure all suggestions are unique and we have at most 3
         suggestions = list(dict.fromkeys(suggestions))  # Remove duplicates while preserving order
         return suggestions[:3]
-
-# Removed previous _extract_citations and _retrieve_context specific variable names
-# Renamed to _extract_rag_citations and _retrieve_rag_context for clarity

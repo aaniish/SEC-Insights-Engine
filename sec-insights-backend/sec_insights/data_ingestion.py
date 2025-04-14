@@ -111,8 +111,7 @@ class SECDataIngestion:
                 f"Attempting to download {limit} {filing_type} filings for {ticker} "
                 f"to path: {os.path.abspath(self.download_path)} using email: {self.dl.user_agent}"
             )
-            # The get() method saves the filings to the current working directory by default
-            # We need to change to the download directory temporarily to ensure files are saved there
+
             original_dir = os.getcwd()
             try:
                 os.chdir(self.download_path)
@@ -191,8 +190,6 @@ class SECDataIngestion:
         if cik_match:
             cik = cik_match.group(1).zfill(10)
         else:
-            # If we can't extract CIK from accession number, we'll need to look it up
-            # For now we'll use a placeholder format
             cik = "0000000000"
             logging.warning(f"Could not extract CIK from accession number {accession_number}. Using placeholder.")
         

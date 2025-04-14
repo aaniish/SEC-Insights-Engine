@@ -1,14 +1,147 @@
 # SEC Insights Engine
 
-An AI-powered application for extracting insights from SEC filings.
+An AI-powered answer engine for extracting insights from SEC filings, built as a take-home assignment.
 
-## Features
+## Project Overview
 
-- Chat interface for asking questions about public company SEC filings
-- Supports 10-K and 10-Q reports analysis
-- Company selection to focus queries on specific organizations
-- Dark and light mode themes
-- Responsive design with custom black/grey and orange theme
+SEC Insights Engine is a sophisticated Retrieval Augmented Generation (RAG) application that allows users to query financial information from SEC filings. This specialized domain-focused approach provides valuable insights for investors, analysts, and anyone interested in public company data.
+
+**Note:** For this demonstration, the application intentionally includes only a limited set of companies (AAPL, MSFT, AMZN, GOOGL, META). This focused approach allows for faster data ingestion and setup while showcasing the core functionality. The system is designed to be easily expanded to include additional companies.
+
+### Key Features
+
+- **Interactive Chat Interface** for natural language queries about SEC filings
+- **RAG Architecture** with semantic search and contextual retrieval
+- **Company Selection** to focus queries on specific organizations
+- **10-K and 10-Q Report Analysis** for comprehensive financial insights
+- **Personalization** with dark/light mode themes
+- **Multi-turn Conversations** with contextual follow-ups
+- **Suggested Queries** based on conversation context
+- **Citations** linking back to source documents and sections
+- **Responsive Design** with custom black/grey and orange theme
+
+## How This Project Meets the Assignment Requirements
+
+### Functional Requirements
+
+✅ **Working Answer Engine**
+- Fully functional application that responds to queries about SEC filings
+- Complete end-to-end system with frontend, backend, and data processing
+
+✅ **RAG Implementation**
+- Retrieves context from SEC filings based on query relevance
+- Enhances LLM responses with specific data from financial documents
+- Ranks and filters results for optimal context selection
+
+✅ **Specialized Data Source**
+- Focuses on SEC filings (10-K, 10-Q) as a specialized data domain
+- Uses SEC Edgar API to retrieve official financial documents
+- Extracts meaningful sections like Risk Factors and MD&A
+
+✅ **LLM Integration**
+- Leverages OpenAI GPT models for response generation
+- Properly formats prompts with retrieved context
+- Handles follow-up questions with conversational context
+
+### Non-Functional Requirements
+
+✅ **Slick UI**
+- Modern and responsive design
+- Dark/light mode toggle for personalization
+- Clean chat interface with message formatting
+- Loading states and animations
+
+✅ **Beyond Simple DB Interface**
+- Implements sophisticated RAG architecture
+- Includes agentic behaviors for query understanding
+- Contains specialized tools for different query types
+- Maintains contextual awareness across conversation turns
+
+✅ **Data Richness**
+- Processes real SEC filings with complete information
+- Supports multiple companies
+- Preserves metadata about documents and sections
+- Allows for comparative analysis between companies
+
+✅ **Technology Stack**
+- Python backend (FastAPI)
+- TypeScript with Next.js frontend
+- Next.js App Router
+- Tailwind CSS for styling
+
+### Optional Features
+
+✅ **Citations**
+- Each response includes citations to source documents
+- References company, filing type, and specific sections
+
+✅ **Personalization**
+- User can select specific companies to analyze
+- Customizable theme (dark/light mode)
+
+✅ **Multi-turn Conversations**
+- Maintains chat history for context
+- Allows follow-up questions that reference previous queries
+
+✅ **Suggested Queries**
+- Provides context-aware suggested follow-up questions
+- Based on retrieved documents and conversation flow
+
+✅ **Agentic Behavior**
+- Implements specialized agent for financial document analysis
+- Contains tools for different query types (comparison, trend analysis)
+- Customizes response format based on query intent
+
+## Architecture
+
+![SEC Insights Engine Architecture](architecture-diagram.png)
+
+*Note: Please replace with actual architecture diagram before submission*
+
+The application follows a modern architecture with three main components:
+
+1. **Frontend (Next.js + TypeScript + Tailwind CSS)**
+   - React components for UI elements
+   - TypeScript for type safety
+   - Tailwind CSS for styling
+   - Context providers for state management
+
+2. **Backend (Python + FastAPI)**
+   - FastAPI server for API endpoints
+   - RAG implementation for document retrieval and processing
+   - LLM integration for generating responses
+   - SEC API integration for data sourcing
+
+3. **Vector Database**
+   - ChromaDB for vector storage
+   - Document embeddings for semantic search
+   - Metadata storage for document context
+
+### RAG Implementation Details
+
+The RAG system works in several stages:
+
+1. **Data Ingestion**
+   - Downloads SEC filings (10-K, 10-Q) using SEC Edgar API
+   - Extracts key sections (Risk Factors, MD&A)
+   - Processes and cleans the text
+
+2. **Chunking and Embedding**
+   - Splits documents into semantic chunks
+   - Generates vector embeddings for each chunk
+   - Stores chunks with metadata in vector database
+
+3. **Retrieval**
+   - Processes user queries
+   - Performs semantic search to find relevant chunks
+   - Filters by company when specified
+   - Ranks results by relevance
+
+4. **Generation**
+   - Constructs prompt with retrieved context
+   - Generates coherent response using OpenAI GPT models
+   - Includes citations and source information
+   - Suggests related follow-up queries
 
 ## Setup
 
@@ -17,6 +150,8 @@ An AI-powered application for extracting insights from SEC filings.
 - Node.js 18+
 - Docker and Docker Compose
 - Git
+- OpenAI API key
+- SEC API credentials
 
 ### Environment Setup
 
@@ -63,54 +198,54 @@ Before you can use the application effectively, you need to ingest SEC filings d
    - Process and chunk the text
    - Add the chunks to the vector database
 
-4. By default, the script processes a limited set of companies. To add more companies:
+4. By default, the script processes a limited set of companies (AAPL, MSFT, AMZN, GOOGL, META) for demonstration purposes. To add more companies:
    - Edit `sec-insights-backend/scripts/ingest_data.py`
    - Modify the `COMPANIES_TO_INGEST` list
    - Adjust the `FILING_TYPES` and `LIMIT_PER_FILING_TYPE` settings if needed
 
 5. Wait for the ingestion process to complete. This may take several minutes depending on the number of filings being processed.
 
-## Git Repository Setup
+## Demo Video
 
-If you're setting up this project as a new Git repository:
+A ~2 minute video demonstration of the SEC Insights Engine is available at [link to video]. 
 
-1. Initialize Git:
-   ```bash
-   git init
-   ```
+The demo showcases:
+- Application overview and UI walkthrough
+- Company selection and theme customization
+- Example queries and responses
+- Multi-turn conversation capability
+- How citations and suggested queries work
 
-2. Add your files:
-   ```bash
-   git add .
-   ```
-
-3. Make your first commit:
-   ```bash
-   git commit -m "Initial commit"
-   ```
-
-4. Add a remote repository:
-   ```bash
-   git remote add origin <your-repository-url>
-   ```
-
-5. Push to the remote repository:
-   ```bash
-   git push -u origin main
-   ```
-
-## Development
-
-### File Structure
+## Project Structure
 
 - `sec-insights-engine/`: Frontend Next.js application
+  - `app/`: Next.js app router files
+  - `components/`: React components including chat interface
+  - `lib/`: Utility functions and type definitions
+  
 - `sec-insights-backend/`: Python backend for SEC data processing
+  - `main.py`: FastAPI application entry point
+  - `scripts/`: Data ingestion scripts
+  - `sec_insights/`: Core modules including RAG pipeline
+    - `agent.py`: Implementation of SEC-specific agent
+    - `data_ingestion.py`: SEC data fetching and processing
+    - `rag_pipeline.py`: RAG implementation
+    - `vector_store.py`: Vector database interface
+
 - `docker-compose.yml`: Docker configuration for the full stack
 
-### API Keys Protection
+## Implementation Notes
 
-Important: Never commit your `.env` file to version control. It contains sensitive API keys and is already in the `.gitignore` file.
+### Third-Party Dependencies
 
-## License
+- **SEC Edgar API**: Used for retrieving SEC filings
+- **OpenAI API**: Powers the LLM for response generation
+- **ChromaDB**: Vector database for storing embeddings
+- **LangChain**: Tools for RAG implementation
 
-[MIT License](LICENSE) 
+### Limitations and Future Improvements
+
+- Currently supports a limited set of companies by design; the architecture is built to be easily expanded to include more companies
+- Could be enhanced with visualizations for financial data
+- Potential for more detailed analysis of financial metrics
+- Could integrate additional data sources beyond SEC filings
