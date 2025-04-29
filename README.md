@@ -1,6 +1,6 @@
 # SEC Insights Engine
 
-An AI-powered answer engine for extracting insights from SEC filings, built as a take-home assignment.
+An AI-powered answer engine for extracting insights from SEC filings, built as a take-home.
 
 ## Project Overview
 
@@ -20,7 +20,7 @@ SEC Insights Engine is a sophisticated Retrieval Augmented Generation (RAG) appl
 - **Citations** linking back to source documents and sections
 - **Responsive Design** with custom black/grey and orange theme
 
-## How This Project Meets the Assignment Requirements
+## How This Project Meets the Requirements
 
 ### Functional Requirements
 
