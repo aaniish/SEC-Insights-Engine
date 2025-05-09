@@ -1,6 +1,6 @@
 # SEC Insights Engine
 
-An AI-powered answer engine for extracting insights from SEC filings, built as a take-home.
+An AI-powered answer engine for extracting insights from SEC filings.
 
 ## Project Overview
 
