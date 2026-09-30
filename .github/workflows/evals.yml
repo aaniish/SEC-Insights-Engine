@@ -1,0 +1,23 @@
+name: Evals
+
+# Runs the answer-quality suite against the live database and models (costs a few cents).
+on:
+  workflow_dispatch:
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+      SEC_EMAIL_ADDRESS: ${{ secrets.SEC_EMAIL_ADDRESS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm eval
+      - run: cat evals/results.md >> "$GITHUB_STEP_SUMMARY"

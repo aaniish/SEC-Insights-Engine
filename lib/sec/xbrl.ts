@@ -108,6 +108,22 @@ export const METRICS = {
 export type MetricKey = keyof typeof METRICS;
 export const METRIC_KEYS = Object.keys(METRICS) as MetricKey[];
 
+export const DERIVED_METRICS = {
+  freeCashFlow: { label: "Free cash flow", unit: "USD" },
+  grossMargin: { label: "Gross margin", unit: "percent" },
+  operatingMargin: { label: "Operating margin", unit: "percent" },
+  netMargin: { label: "Net margin", unit: "percent" },
+} as const;
+
+export type DerivedMetric = keyof typeof DERIVED_METRICS;
+export type AnyMetric = MetricKey | DerivedMetric;
+
+export function metricLabel(metric: string): string {
+  if (metric in METRICS) return METRICS[metric as MetricKey].label;
+  if (metric in DERIVED_METRICS) return DERIVED_METRICS[metric as DerivedMetric].label;
+  return metric;
+}
+
 type Quarter = "Q1" | "Q2" | "Q3" | "Q4";
 
 export interface FinancialPoint {

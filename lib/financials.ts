@@ -3,7 +3,15 @@ import { findCompany } from "@/lib/companies";
 import { db } from "@/lib/db/client";
 import { companies, financialFacts } from "@/lib/db/schema";
 import { padCik, SecRequestError, secJson } from "@/lib/sec/client";
-import { type CompanyFacts, METRICS, type MetricKey, normalizeCompanyFacts } from "@/lib/sec/xbrl";
+import {
+  type AnyMetric,
+  type CompanyFacts,
+  DERIVED_METRICS,
+  type DerivedMetric,
+  METRICS,
+  type MetricKey,
+  normalizeCompanyFacts,
+} from "@/lib/sec/xbrl";
 
 const FACTS_TTL_MS = 24 * 60 * 60 * 1000;
 const INSERT_BATCH = 500;
@@ -51,16 +59,6 @@ export interface FinancialSeries {
   unit: "USD" | "USD/shares" | "percent";
   points: SeriesPoint[];
 }
-
-export const DERIVED_METRICS = {
-  freeCashFlow: { label: "Free cash flow", unit: "USD" },
-  grossMargin: { label: "Gross margin", unit: "percent" },
-  operatingMargin: { label: "Operating margin", unit: "percent" },
-  netMargin: { label: "Net margin", unit: "percent" },
-} as const;
-
-export type DerivedMetric = keyof typeof DERIVED_METRICS;
-export type AnyMetric = MetricKey | DerivedMetric;
 
 const DERIVATION: Record<
   DerivedMetric,

@@ -2,7 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 import { findCompany, touchCompanies } from "@/lib/companies";
 import { compareFilings } from "@/lib/diff/compare";
-import { DERIVED_METRICS, getFinancialSeries } from "@/lib/financials";
+import { getFinancialSeries } from "@/lib/financials";
 import {
   filingsForCompany,
   getFiling,
@@ -13,7 +13,7 @@ import {
 import { consumeLimit, limitMessage } from "@/lib/rate-limit";
 import { hybridSearch, type SearchHit } from "@/lib/retrieval/hybrid-search";
 import { fetchCompanyFilings } from "@/lib/sec/edgar";
-import { METRIC_KEYS } from "@/lib/sec/xbrl";
+import { DERIVED_METRICS, METRIC_KEYS } from "@/lib/sec/xbrl";
 
 export interface ToolContext {
   /** Hashed client identifier for per-visitor limits. */

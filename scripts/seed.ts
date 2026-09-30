@@ -9,23 +9,11 @@ import { sql } from "drizzle-orm";
 import { findCompany, syncCompanies } from "@/lib/companies";
 import { db } from "@/lib/db/client";
 import { companies } from "@/lib/db/schema";
+import { CURATED_TICKERS } from "@/lib/featured";
 import { ensureFinancials } from "@/lib/financials";
 import { ingestFiling, latestFilings } from "@/lib/ingest/ingest-filing";
 
-export const CURATED = [
-  "AAPL",
-  "MSFT",
-  "NVDA",
-  "AMZN",
-  "GOOGL",
-  "META",
-  "TSLA",
-  "JPM",
-  "WMT",
-  "NFLX",
-  "COST",
-  "AMD",
-];
+const CURATED: readonly string[] = CURATED_TICKERS;
 
 async function seedCompany(ticker: string) {
   const company = await findCompany(ticker);
