@@ -7,7 +7,7 @@ const REPO_URL = "https://github.com/aaniish/SEC-Insights-Engine";
 export function Mark({ className = "size-8" }: { className?: string }) {
   return (
     <span aria-hidden="true" className={`gloss grid shrink-0 place-items-center rounded-full ${className}`}>
-      <svg viewBox="0 0 24 24" className="size-[60%]" fill="none">
+      <svg viewBox="0 0 24 24" className="size-[60%]" fill="none" aria-hidden="true">
         <path
           d="M4.5 16.5 9.5 11.5 13 14 19 7.5"
           stroke="currentColor"
