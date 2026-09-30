@@ -1,13 +1,14 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { findCompany } from "@/lib/companies";
 import { db } from "@/lib/db/client";
-import { companies, financialFacts } from "@/lib/db/schema";
+import { chunks, companies, filings, financialFacts } from "@/lib/db/schema";
 import { padCik, SecRequestError, secJson } from "@/lib/sec/client";
 import {
   type AnyMetric,
   type CompanyFacts,
   DERIVED_METRICS,
   type DerivedMetric,
+  filingFiscalPeriods,
   METRICS,
   type MetricKey,
   normalizeCompanyFacts,
@@ -16,11 +17,28 @@ import {
 const FACTS_TTL_MS = 24 * 60 * 60 * 1000;
 const INSERT_BATCH = 500;
 
-/** Fetches and caches a company's XBRL facts; refreshed at most once a day. */
-export async function ensureFinancials(cik: number): Promise<boolean> {
+/** Replaces date-inferred fiscal labels with the ones the company tagged in XBRL. */
+async function relabelFilings(cik: number, facts: CompanyFacts): Promise<void> {
+  const tagged = filingFiscalPeriods(facts);
+  const known = await db().select().from(filings).where(eq(filings.cik, cik));
+  for (const filing of known) {
+    const label = tagged.get(filing.accession);
+    if (!label || (label.fiscalYear === filing.fiscalYear && label.fiscalPeriod === filing.fiscalPeriod))
+      continue;
+    await db().update(filings).set(label).where(eq(filings.accession, filing.accession));
+    await db().update(chunks).set(label).where(eq(chunks.accession, filing.accession));
+  }
+}
+
+/**
+ * Fetches and caches a company's XBRL facts (refreshed at most once a day, or
+ * when forced during ingestion) and corrects its filings' fiscal labels.
+ */
+export async function ensureFinancials(cik: number, { force = false } = {}): Promise<boolean> {
   const company = await findCompany(cik);
   if (!company) return false;
-  if (company.factsFetchedAt && Date.now() - company.factsFetchedAt.getTime() < FACTS_TTL_MS) return true;
+  const fresh = company.factsFetchedAt && Date.now() - company.factsFetchedAt.getTime() < FACTS_TTL_MS;
+  if (fresh && !force) return true;
 
   let facts: CompanyFacts;
   try {
@@ -39,6 +57,7 @@ export async function ensureFinancials(cik: number): Promise<boolean> {
       .values(points.slice(i, i + INSERT_BATCH).map((p) => ({ ...p, cik })))
       .onConflictDoNothing();
   }
+  await relabelFilings(cik, facts);
   await db().update(companies).set({ factsFetchedAt: new Date() }).where(eq(companies.cik, cik));
   return points.length > 0;
 }

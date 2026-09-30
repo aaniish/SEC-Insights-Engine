@@ -3,6 +3,7 @@ import { embedTexts } from "@/lib/ai/models";
 import { type Company, findCompany } from "@/lib/companies";
 import { db } from "@/lib/db/client";
 import { chunks, filings, sections } from "@/lib/db/schema";
+import { ensureFinancials } from "@/lib/financials";
 import { chunkText } from "@/lib/sec/chunk";
 import { secText } from "@/lib/sec/client";
 import { type EdgarFiling, fetchCompanyFilings, type SupportedForm } from "@/lib/sec/edgar";
@@ -97,6 +98,9 @@ export async function ingestFiling(accession: string, mode: IngestMode = "full")
 
   try {
     if (mode === "full") await ensureStorageHeadroom();
+    // Refreshes XBRL facts, which also corrects this filing's fiscal year/period label.
+    await ensureFinancials(company.cik, { force: true }).catch(() => false);
+    Object.assign(filing, await getFiling(accession));
 
     const text = htmlToText(await secText(filing.docUrl));
     const parsed = splitSections(text, filing.form as FilingForm);

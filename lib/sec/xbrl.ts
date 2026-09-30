@@ -345,3 +345,27 @@ export function normalizeCompanyFacts(facts: CompanyFacts): FinancialPoint[] {
     return dedupeSlots(points).sort((a, b) => a.periodEnd.localeCompare(b.periodEnd));
   });
 }
+
+/**
+ * Each filing's own fiscal year/period, as the company tagged it (dei:DocumentFiscalYearFocus
+ * surfaces as `fy`/`fp` on every fact). Companies name 52/53-week years differently, so this
+ * beats inferring the label from dates.
+ */
+export function filingFiscalPeriods(
+  facts: CompanyFacts,
+): Map<string, { fiscalYear: number; fiscalPeriod: string }> {
+  const periods = new Map<string, { fiscalYear: number; fiscalPeriod: string }>();
+  for (const concepts of Object.values(facts.facts)) {
+    for (const { units } of Object.values(concepts)) {
+      for (const points of Object.values(units)) {
+        for (const fact of points) {
+          if (!fact.fy || !fact.fp || periods.has(fact.accn) || !ACCEPTED_FORMS.has(fact.form)) continue;
+          if (fact.fp === "FY" || /^Q[1-3]$/.test(fact.fp)) {
+            periods.set(fact.accn, { fiscalYear: fact.fy, fiscalPeriod: fact.fp });
+          }
+        }
+      }
+    }
+  }
+  return periods;
+}

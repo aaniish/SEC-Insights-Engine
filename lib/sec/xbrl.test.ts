@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type CompanyFacts, normalizeCompanyFacts, type RawFact } from "./xbrl";
+import { type CompanyFacts, filingFiscalPeriods, normalizeCompanyFacts, type RawFact } from "./xbrl";
 
 function facts(concepts: Record<string, RawFact[]>, unit = "USD"): CompanyFacts {
   return {
@@ -120,5 +120,21 @@ describe("normalizeCompanyFacts", () => {
       }),
     );
     expect(series(result, "totalAssets")).toEqual(["2025Q2=900", "2025FY=1000", "2025Q4=1000"]);
+  });
+});
+
+describe("filingFiscalPeriods", () => {
+  it("maps each filing to the fiscal year/period it was tagged with", () => {
+    const periods = filingFiscalPeriods(
+      facts({
+        Revenues: [
+          // Domino's-style 52/53-week year ending in early January, tagged as fiscal 2025.
+          { ...fact("2024-12-30", "2026-01-03", 4.9e9, 2025, "FY", "2026-02-24"), accn: "10k" },
+          { ...fact("2026-01-04", "2026-03-22", 1.1e9, 2026, "Q1", "2026-04-27"), accn: "10q" },
+        ],
+      }),
+    );
+    expect(periods.get("10k")).toEqual({ fiscalYear: 2025, fiscalPeriod: "FY" });
+    expect(periods.get("10q")).toEqual({ fiscalYear: 2026, fiscalPeriod: "Q1" });
   });
 });

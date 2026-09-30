@@ -32,11 +32,14 @@ export function fiscalPeriodOf(reportDate: string, fiscalYearEnd: string | null,
   const yearEnd = [year - 1, year, year + 1]
     .map((y) => utcDate(y, month, day))
     .find((d) => d.getTime() >= earliest) as Date;
-  const fiscalYear = yearEnd.getUTCFullYear();
+  // A 52/53-week year ending in the first days of January is a calendar year that
+  // spilled over (e.g. Domino's), and companies name it after the earlier year.
+  const spillsIntoJanuary = month === 1 && day <= 7;
+  const fiscalYear = yearEnd.getUTCFullYear() - (spillsIntoJanuary ? 1 : 0);
 
   if (form.startsWith("10-K")) return { fiscalYear, fiscalPeriod: "FY" };
 
-  const previousYearEnd = utcDate(fiscalYear - 1, month, day);
+  const previousYearEnd = utcDate(yearEnd.getUTCFullYear() - 1, month, day);
   const months = (report.getTime() - previousYearEnd.getTime()) / (DAY_MS * 30.44);
   const quarter = Math.min(4, Math.max(1, Math.round(months / 3)));
   return {

@@ -39,6 +39,11 @@ describe("fiscalPeriodOf", () => {
     });
   });
 
+  it("names 52/53-week years that end in early January after the earlier year", () => {
+    expect(fiscalPeriodOf("2025-12-28", "0103", "10-K")).toEqual({ fiscalYear: 2025, fiscalPeriod: "FY" });
+    expect(fiscalPeriodOf("2026-06-14", "0103", "10-Q")).toEqual({ fiscalYear: 2026, fiscalPeriod: "Q2" });
+  });
+
   it("defaults to a December year-end when unknown", () => {
     expect(fiscalPeriodOf("2026-03-31", null, "10-Q")).toEqual({
       fiscalYear: 2026,
