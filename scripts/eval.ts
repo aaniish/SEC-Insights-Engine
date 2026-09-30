@@ -74,13 +74,14 @@ const judgeSchema = z.object({
 
 /** Share of cited sentences whose claims are supported by the passages they cite. */
 async function faithfulness(text: string, citations: Map<number, Citation>): Promise<number | undefined> {
-  // Citations often trail the period ("…growth. [2][3]"); glue those fragments to their sentence.
+  // Citations often trail the period ("…growth. [2][3] Next sentence"); move them back to their sentence.
   const pieces = text.split(/(?<=[.!?])\s+|\n+/).filter((s) => s.trim());
   const merged: string[] = [];
   for (const piece of pieces) {
-    if (/^(\[\d[\d,\s–-]*\]\s*)+$/.test(piece.trim()) && merged.length > 0)
-      merged[merged.length - 1] += ` ${piece}`;
-    else merged.push(piece);
+    const [, leading = "", rest = piece] = piece.trim().match(/^((?:\[\d[\d,\s–-]*\]\s*)*)(.*)$/) ?? [];
+    if (leading && merged.length > 0) merged[merged.length - 1] += ` ${leading.trim()}`;
+    else if (leading) merged.push(leading);
+    if (rest.trim()) merged.push(rest);
   }
   const sentences = merged.filter((s) => citedNumbers(s).some((n) => citations.has(n))).slice(0, 8);
   if (sentences.length === 0) return undefined;
