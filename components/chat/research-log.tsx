@@ -116,16 +116,16 @@ function Line({ line }: { line: LogLine }) {
   return (
     <li className="log-line flex gap-2">
       <span className="mt-[0.2rem] shrink-0" aria-hidden="true">
-        {line.status === "running" && <Loader2 className="size-3 animate-spin text-amber-ink" />}
-        {line.status === "done" && <Check className="size-3 text-graphite" />}
-        {line.status === "error" && <AlertTriangle className="size-3 text-redline" />}
+        {line.status === "running" && <Loader2 className="size-3.5 animate-spin text-navy-ink" />}
+        {line.status === "done" && <Check className="size-3.5 text-graphite" />}
+        {line.status === "error" && <AlertTriangle className="size-3.5 text-redline" />}
       </span>
       <span className="min-w-0 flex-1">
         <span className={cn(line.status === "error" && "text-redline")}>{line.text}</span>
         {line.status === "running" && line.progress !== undefined && (
-          <span className="mt-1 block h-1 w-full max-w-60 overflow-hidden rounded-full bg-muted">
+          <span className="mt-1.5 block h-1 w-full max-w-64 overflow-hidden rounded-full bg-muted">
             <span
-              className="block h-full rounded-full bg-amber transition-[width] duration-500"
+              className="block h-full rounded-full bg-navy transition-[width] duration-500"
               style={{ width: `${Math.max(4, line.progress)}%` }}
             />
           </span>
@@ -146,7 +146,7 @@ export function ResearchLog({ parts, working }: { parts: ToolPart[]; working: bo
   if (lines.length === 0) {
     if (!working) return null;
     return (
-      <ul className="font-mono text-[0.72rem] text-graphite" aria-live="polite">
+      <ul className="text-[0.84rem] text-graphite" aria-live="polite">
         <Line line={{ id: "thinking", status: "running", text: "Reading the question" }} />
       </ul>
     );
@@ -158,9 +158,9 @@ export function ResearchLog({ parts, working }: { parts: ToolPart[]; working: bo
       <button
         type="button"
         onClick={() => setExpanded(true)}
-        className="group flex items-center gap-1.5 font-mono text-[0.72rem] text-graphite hover:text-foreground"
+        className="glass group inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-graphite hover:text-ink"
       >
-        <ChevronRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+        <ChevronRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
         {lines.length} {lines.length === 1 ? "step" : "steps"}
         {searches > 0 && ` · ${searches} ${searches === 1 ? "search" : "searches"}`}
         {lines.some((l) => l.status === "error") && " · 1 issue"}
@@ -169,13 +169,13 @@ export function ResearchLog({ parts, working }: { parts: ToolPart[]; working: bo
   }
 
   return (
-    <div className="font-mono text-[0.72rem] leading-relaxed text-graphite">
+    <div className="text-[0.84rem] leading-relaxed text-graphite">
       {!working && (
-        <button type="button" onClick={() => setExpanded(false)} className="mb-1 hover:text-foreground">
+        <button type="button" onClick={() => setExpanded(false)} className="mb-1.5 text-xs hover:text-ink">
           Hide steps
         </button>
       )}
-      <ul className="space-y-1" aria-live="polite">
+      <ul className="space-y-1.5" aria-live="polite">
         {lines.map((line) => (
           <Line key={line.id} line={line} />
         ))}

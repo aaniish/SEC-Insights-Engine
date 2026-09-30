@@ -14,7 +14,7 @@ const KIND_LABEL = { added: "New", removed: "Removed", modified: "Reworded" } as
 function Redline({ before, after }: { before: string; after: string }) {
   const parts = useMemo(() => diffWords(before, after), [before, after]);
   return (
-    <p className="font-serif text-[0.9rem] leading-relaxed">
+    <p className="text-[0.9rem] leading-relaxed">
       {parts.map((part, i) =>
         part.added ? (
           // biome-ignore lint/suspicious/noArrayIndexKey: diff parts are positional
@@ -49,7 +49,7 @@ function Expandable<T>({
   const shown = all ? items : items.slice(0, PREVIEW);
   return (
     <div>
-      <ol className="divide-y divide-rule/70">
+      <ol className="divide-y divide-rule">
         {shown.map((item) => (
           <li key={itemKey(item)} className="py-3">
             {render(item)}
@@ -60,7 +60,7 @@ function Expandable<T>({
         <button
           type="button"
           onClick={() => setAll((v) => !v)}
-          className="font-mono text-[0.7rem] text-graphite hover:text-foreground"
+          className="text-xs font-medium text-graphite hover:text-ink"
         >
           {all ? "Show fewer" : `Show all ${items.length}`}
         </button>
@@ -83,10 +83,10 @@ export function FilingDiffCard({ diff }: { diff: FilingDiff }) {
     >
       <header className="border-b px-4 py-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="text-sm font-semibold">
+          <h3 className="font-display text-xl">
             {diff.sectionTitle} · {diff.ticker}
           </h3>
-          <div className="flex gap-3 font-mono text-[0.68rem] text-graphite">
+          <div className="flex gap-3 text-xs text-graphite">
             <a href={diff.from.url} target="_blank" rel="noreferrer" className="hover:text-foreground">
               FY{diff.from.fiscalYear} 10-K <ArrowUpRight className="inline size-3" />
             </a>
@@ -96,8 +96,8 @@ export function FilingDiffCard({ diff }: { diff: FilingDiff }) {
             </a>
           </div>
         </div>
-        <p className="mt-1.5 font-serif text-[0.95rem] leading-snug">{diff.headline}</p>
-        <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[0.7rem] text-graphite">
+        <p className="mt-1.5 text-[0.95rem] leading-snug">{diff.headline}</p>
+        <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-graphite tabular">
           <div>
             <dt className="sr-only">New paragraphs</dt>
             <dd>
@@ -124,12 +124,12 @@ export function FilingDiffCard({ diff }: { diff: FilingDiff }) {
       </header>
 
       {diff.highlights.length > 0 && (
-        <ul className="divide-y divide-rule/70 border-b">
+        <ul className="divide-y divide-rule border-b">
           {diff.highlights.map((h) => (
             <li key={h.title} className="flex gap-3 px-4 py-2.5">
               <span
                 className={cn(
-                  "mt-0.5 h-fit shrink-0 rounded-sm border px-1.5 py-px font-mono text-[0.62rem] uppercase",
+                  "mt-0.5 h-fit shrink-0 rounded-full border px-2 py-px text-[0.65rem] font-medium",
                   h.kind === "added" && "border-insert/40 text-insert",
                   h.kind === "removed" && "border-redline/40 text-redline",
                   h.kind === "modified" && "text-graphite",
@@ -141,7 +141,7 @@ export function FilingDiffCard({ diff }: { diff: FilingDiff }) {
                 <div className="text-sm font-medium">
                   {h.title}
                   {h.severity === "high" && (
-                    <span className="ml-2 font-mono text-[0.62rem] font-normal text-amber-ink uppercase">
+                    <span className="ml-2 rounded-full bg-navy-soft px-2 py-px text-[0.65rem] font-medium text-navy-ink">
                       material
                     </span>
                   )}
@@ -154,7 +154,7 @@ export function FilingDiffCard({ diff }: { diff: FilingDiff }) {
       )}
 
       <Tabs defaultValue="added" className="px-4 pt-3 pb-2">
-        <TabsList className="font-mono text-[0.7rem]">
+        <TabsList className="rounded-full text-xs">
           <TabsTrigger value="added">New ({stats.added})</TabsTrigger>
           <TabsTrigger value="removed">Removed ({stats.removed})</TabsTrigger>
           <TabsTrigger value="modified">Reworded ({stats.modified})</TabsTrigger>
@@ -164,9 +164,7 @@ export function FilingDiffCard({ diff }: { diff: FilingDiff }) {
             items={diff.added}
             itemKey={(text) => text}
             render={(text) => (
-              <p className="border-l-2 border-insert/60 pl-3 font-serif text-[0.9rem] leading-relaxed">
-                {text}
-              </p>
+              <p className="border-l-2 border-insert/60 pl-3 text-[0.9rem] leading-relaxed">{text}</p>
             )}
           />
         </TabsContent>
@@ -175,7 +173,7 @@ export function FilingDiffCard({ diff }: { diff: FilingDiff }) {
             items={diff.removed}
             itemKey={(text) => text}
             render={(text) => (
-              <p className="border-l-2 border-redline/60 pl-3 font-serif text-[0.9rem] leading-relaxed text-graphite line-through decoration-redline/50">
+              <p className="border-l-2 border-redline/60 pl-3 text-[0.9rem] leading-relaxed text-graphite line-through decoration-redline/50">
                 {text}
               </p>
             )}

@@ -35,25 +35,25 @@ function useCitations() {
   return context;
 }
 
-export const noteId = (turnId: string, n: number) => `note-${turnId}-${n}`;
+const cardId = (turnId: string, n: number) => `source-${turnId}-${n}`;
 
 export function sourceLabel(c: Citation) {
   return `${c.ticker} · ${c.form} ${c.period}`;
 }
 
-/** Inline "[n]" marker. Hover previews the passage; click jumps to it in the margin. */
+/** Inline numbered pill. Hover previews the passage; click jumps to its source card. */
 export function CitationMarker({ n }: { n: number }) {
   const { turnId, citations, active, setActive } = useCitations();
   const citation = citations.get(n);
   if (!citation) return <sup>[{n}]</sup>;
 
-  const jumpToNote = () => {
-    const note = document.getElementById(noteId(turnId, n));
-    if (!note || note.offsetParent === null) return; // margin hidden on small screens
-    note.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    note.classList.remove("cite-flash");
-    void note.offsetWidth;
-    note.classList.add("cite-flash");
+  const jumpToCard = () => {
+    const card = document.getElementById(cardId(turnId, n));
+    if (!card) return;
+    card.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+    card.classList.remove("cite-flash");
+    void card.offsetWidth;
+    card.classList.add("cite-flash");
   };
 
   return (
@@ -68,114 +68,106 @@ export function CitationMarker({ n }: { n: number }) {
           onFocus={() => setActive(n)}
           onBlur={() => setActive(null)}
           onClick={(event) => {
-            if (window.matchMedia("(min-width: 1024px)").matches) {
+            if (window.matchMedia("(pointer: fine)").matches) {
               event.preventDefault();
-              jumpToNote();
+              jumpToCard();
             }
           }}
           aria-label={`Source ${n}: ${sourceLabel(citation)}, ${citation.section}`}
           className={cn(
-            "mx-px inline-flex h-[1.15rem] min-w-[1.15rem] -translate-y-[0.1em] items-center justify-center rounded-[4px] border border-amber/40 px-1 align-middle font-mono text-[0.66rem] font-medium text-amber-ink no-underline transition-colors hover:bg-amber/15",
-            active === n && "bg-amber/20",
+            "mx-[0.15em] inline-flex h-[1.15rem] min-w-[1.15rem] -translate-y-[0.12em] items-center justify-center rounded-full bg-muted px-1.5 align-middle text-[0.66rem] font-semibold text-graphite no-underline tabular transition-colors hover:bg-navy hover:text-white",
+            active === n && "bg-navy text-white",
           )}
         >
           {n}
         </a>
       </HoverCardTrigger>
-      <HoverCardContent side="top" className="w-80 p-0">
-        <SourceBody citation={citation} clamp="line-clamp-6" />
+      <HoverCardContent side="top" className="glass glass-dense w-80 rounded-2xl border-0 p-0 ring-0">
+        <div className="space-y-1.5 p-4">
+          <div className="flex items-baseline justify-between gap-2 text-[0.72rem] text-graphite">
+            <span className="font-semibold text-ink">{sourceLabel(citation)}</span>
+            <span>Filed {citation.filedAt}</span>
+          </div>
+          <div className="text-xs font-medium text-navy-ink">{citation.section}</div>
+          <p className="line-clamp-6 text-[0.84rem] leading-snug text-ink/85">{citation.text}</p>
+          <a
+            href={citation.url}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 pt-1 text-xs font-medium text-navy-ink hover:underline"
+          >
+            Read it in the filing on sec.gov <ArrowUpRight className="size-3" />
+          </a>
+        </div>
       </HoverCardContent>
     </HoverCard>
   );
 }
 
-function SourceBody({ citation, clamp }: { citation: Citation; clamp: string }) {
-  return (
-    <div className="space-y-1.5 p-3">
-      <div className="flex items-baseline justify-between gap-2 font-mono text-[0.68rem] text-graphite">
-        <span className="text-foreground">{sourceLabel(citation)}</span>
-        <span>filed {citation.filedAt}</span>
-      </div>
-      <div className="text-xs font-medium">{citation.section}</div>
-      <p className={cn("font-serif text-[0.84rem] leading-snug text-foreground/85", clamp)}>
-        {citation.text}
-      </p>
-      <a
-        href={citation.url}
-        target="_blank"
-        rel="noreferrer"
-        className="inline-flex items-center gap-1 text-xs font-medium text-amber-ink hover:underline"
-      >
-        Read in the filing on sec.gov <ArrowUpRight className="size-3" />
-      </a>
-    </div>
-  );
-}
-
-/** Margin notes: the cited passages beside the answer, like an annotated filing. */
-export function SourceNotes({
-  order,
-  className,
-  anchored = false,
-}: {
-  order: number[];
-  className?: string;
-  /** Only the desktop margin gets element ids, so markers can scroll to it. */
-  anchored?: boolean;
-}) {
+/** Source cards above the answer (Perplexity-style): cited passages first, the rest on request. */
+export function SourceStrip({ order }: { order: number[] }) {
   const { turnId, citations, active, setActive } = useCitations();
-  const cited = order.filter((n) => citations.has(n));
   const [showAll, setShowAll] = useState(false);
+  const cited = order.filter((n) => citations.has(n));
   const uncited = [...citations.keys()].filter((n) => !cited.includes(n));
   const visible = showAll ? [...cited, ...uncited] : cited;
-  if (citations.size === 0) return null;
+  if (cited.length === 0) return null;
 
   return (
-    <aside className={className} aria-label="Sources">
-      <div className="mb-2 flex items-baseline justify-between font-mono text-[0.68rem] text-graphite uppercase tracking-wider">
-        <span>Sources</span>
-        <span>
+    <section aria-label="Sources">
+      <div className="mb-2 flex items-baseline gap-2 text-sm font-medium">
+        Sources
+        <span className="text-xs font-normal text-graphite">
           {cited.length} cited · {citations.size} read
         </span>
       </div>
-      <ol className="space-y-1">
+      <ol className="scroll-fade-x -mx-4 flex snap-x scroll-px-4 gap-2 overflow-x-auto px-4 pt-1 pb-3">
         {visible.map((n) => {
           const citation = citations.get(n) as Citation;
           return (
             <li
               key={n}
-              id={anchored ? noteId(turnId, n) : undefined}
+              id={cardId(turnId, n)}
               onMouseEnter={() => setActive(n)}
               onMouseLeave={() => setActive(null)}
               className={cn(
-                "rounded-md border-l-2 border-transparent transition-colors",
-                active === n && "border-amber bg-card",
-                !cited.includes(n) && "opacity-70",
+                "glass w-60 shrink-0 snap-start rounded-2xl transition-transform",
+                active === n &&
+                  "-translate-y-0.5 shadow-[inset_0_1px_0_var(--glass-highlight),0_0_0_1.5px_var(--ring),var(--glass-shadow)]",
+                !cited.includes(n) && "opacity-75",
               )}
             >
-              <a href={citation.url} target="_blank" rel="noreferrer" className="block px-2.5 py-2">
-                <div className="flex items-baseline gap-2 font-mono text-[0.68rem]">
-                  <span className="text-amber-ink">[{n}]</span>
-                  <span className="text-foreground">{sourceLabel(citation)}</span>
+              <a
+                href={citation.url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex h-full flex-col gap-1 p-3"
+              >
+                <div className="flex items-center gap-2 text-[0.7rem] text-graphite">
+                  <span className="grid size-[1.1rem] shrink-0 place-items-center rounded-full bg-muted text-[0.62rem] font-semibold tabular">
+                    {n}
+                  </span>
+                  <span className="truncate font-medium text-ink">{sourceLabel(citation)}</span>
                 </div>
-                <div className="mt-0.5 text-[0.72rem] text-graphite">{citation.section}</div>
-                <p className="mt-1 line-clamp-3 font-serif text-[0.8rem] leading-snug text-foreground/80">
-                  {citation.text}
-                </p>
+                <div className="line-clamp-1 text-xs font-medium text-navy-ink">{citation.section}</div>
+                <p className="line-clamp-2 text-[0.78rem] leading-snug text-graphite">{citation.text}</p>
               </a>
             </li>
           );
         })}
+        {uncited.length > 0 && (
+          <li className="shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowAll((v) => !v)}
+              className="glass flex h-full w-28 flex-col items-start justify-center gap-0.5 rounded-2xl p-3 text-left text-xs text-graphite hover:text-ink"
+            >
+              <span className="text-base font-semibold text-ink">{showAll ? "−" : `+${uncited.length}`}</span>
+              {showAll ? "Show cited only" : "more passages read"}
+            </button>
+          </li>
+        )}
       </ol>
-      {uncited.length > 0 && (
-        <button
-          type="button"
-          onClick={() => setShowAll((v) => !v)}
-          className="mt-2 px-2.5 font-mono text-[0.68rem] text-graphite hover:text-foreground"
-        >
-          {showAll ? "Hide passages that weren’t cited" : `+ ${uncited.length} more passages read`}
-        </button>
-      )}
-    </aside>
+    </section>
   );
 }

@@ -10,7 +10,7 @@ const components: Components = {
     const cite = href?.match(/^#cite-(\d+)$/);
     if (cite) return <CitationMarker n={Number(cite[1])} />;
     return (
-      <a href={href} target="_blank" rel="noreferrer" className="text-amber-ink underline underline-offset-2">
+      <a href={href} target="_blank" rel="noreferrer" className="text-navy-ink underline underline-offset-2">
         {props.children as ReactNode}
       </a>
     );

@@ -87,14 +87,14 @@ function ChartTooltipCard({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-md border bg-popover px-3 py-2 shadow-md">
-      <div className="mb-1 font-mono text-[0.68rem] text-graphite">{label}</div>
+    <div className="glass glass-dense rounded-xl px-3 py-2">
+      <div className="mb-1 text-[0.7rem] font-medium text-graphite">{label}</div>
       <ul className="space-y-0.5">
         {payload.map((entry) => (
           <li key={String(entry.dataKey)} className="flex items-center gap-2 text-xs">
             <span className="h-0.5 w-3 rounded-full" style={{ background: entry.color }} aria-hidden="true" />
             <span className="font-medium tabular">{formatValue(Number(entry.value), unit)}</span>
-            <span className="font-mono text-[0.68rem] text-graphite">{String(entry.dataKey)}</span>
+            <span className="text-[0.7rem] text-graphite">{String(entry.dataKey)}</span>
           </li>
         ))}
       </ul>
@@ -120,18 +120,18 @@ function MetricChart({
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-lg border bg-card p-4 text-sm text-graphite">
+      <div className="glass rounded-2xl p-4 text-sm text-graphite">
         No reported {series[0].label.toLowerCase()} for {tickers.join(", ")} in XBRL data.
       </div>
     );
   }
 
   return (
-    <figure className="rounded-lg border bg-card p-4">
+    <figure className="glass rounded-2xl p-4">
       <figcaption className="mb-3 flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
         <div>
           <div className="text-sm font-semibold">{series[0].label}</div>
-          <div className="font-mono text-[0.68rem] text-graphite">
+          <div className="text-[0.72rem] text-graphite">
             {first === last ? first : `${first} – ${last}`} · SEC XBRL
           </div>
         </div>
@@ -139,7 +139,7 @@ function MetricChart({
           {tickers.length > 1 && (
             <ul className="flex flex-wrap gap-x-3 gap-y-1" aria-label="Legend">
               {tickers.map((t) => (
-                <li key={t} className="flex items-center gap-1.5 font-mono text-[0.68rem]">
+                <li key={t} className="flex items-center gap-1.5 text-[0.72rem] font-medium">
                   <span
                     className="h-0.5 w-3.5 rounded-full"
                     style={{ background: colorFor(t) }}
@@ -155,7 +155,7 @@ function MetricChart({
             onClick={() => setShowTable((v) => !v)}
             aria-pressed={showTable}
             className={cn(
-              "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-mono text-[0.68rem] text-graphite hover:bg-muted hover:text-foreground",
+              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.72rem] text-graphite hover:bg-muted hover:text-ink",
               showTable && "bg-muted text-foreground",
             )}
           >
@@ -166,7 +166,7 @@ function MetricChart({
 
       {showTable ? (
         <div className="overflow-x-auto">
-          <table className="w-full font-mono text-xs tabular">
+          <table className="w-full text-xs tabular">
             <thead>
               <tr className="border-b text-graphite">
                 <th className="py-1.5 pr-4 text-left font-normal">Period</th>
@@ -202,7 +202,7 @@ function MetricChart({
               tickMargin={8}
               interval="preserveStartEnd"
               minTickGap={12}
-              tick={{ fontSize: 11, fontFamily: "var(--font-plex-mono)" }}
+              tick={{ fontSize: 11, fontFamily: "var(--font-inter)" }}
             />
             <YAxis
               width={52}
@@ -211,7 +211,7 @@ function MetricChart({
               ticks={ticks}
               domain={[ticks[0], ticks.at(-1) ?? "auto"]}
               tickFormatter={(v: number) => axisValue(v, unit)}
-              tick={{ fontSize: 11, fontFamily: "var(--font-plex-mono)" }}
+              tick={{ fontSize: 11, fontFamily: "var(--font-inter)" }}
             />
             <Tooltip
               cursor={{ stroke: "var(--chart-axis)", strokeWidth: 1 }}
@@ -243,7 +243,7 @@ function MetricChart({
                         x={Number(props.x) + 9}
                         y={Number(props.y)}
                         dy={4}
-                        className="fill-foreground font-mono text-[10px]"
+                        className="fill-foreground text-[10.5px] font-medium"
                       >
                         {formatValue(props.value, unit)}
                       </text>
@@ -274,7 +274,7 @@ export function FinancialCharts({ series, missing }: { series: FinancialSeries[]
 
   if (charts.length === 0) {
     return (
-      <p className="rounded-lg border bg-card p-4 text-sm text-graphite">
+      <p className="glass rounded-2xl p-4 text-sm text-graphite">
         No XBRL financial data was found for {missing.length ? missing.join(", ") : "that request"}.
       </p>
     );

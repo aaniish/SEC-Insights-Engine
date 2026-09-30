@@ -1,11 +1,10 @@
 "use client";
 
-import { AlertTriangle, CornerDownRight, RotateCcw } from "lucide-react";
+import { AlertTriangle, Plus, RotateCcw } from "lucide-react";
 import { useMemo } from "react";
 import { FinancialCharts } from "@/components/charts/financial-charts";
-import { CitationProvider, SourceNotes } from "@/components/citations/citations";
+import { CitationProvider, SourceStrip } from "@/components/citations/citations";
 import { FilingDiffCard } from "@/components/diff/filing-diff-card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { ChatMessage } from "@/lib/ai/types";
 import {
   answerText,
@@ -63,84 +62,52 @@ export function Turn({ question, answer, working, error, onAsk, onRetry }: TurnP
   const order = useMemo(() => citedNumbers(text), [text]);
   const toolParts = answer?.parts.filter(isToolPart) ?? [];
   const suggestions = answer ? suggestionsOf(answer) : [];
-  // Passages that were read but never cited stay in the research log, not the margin.
-  const hasSources = order.some((n) => citations.has(n));
 
   return (
     <CitationProvider turnId={question.id} citations={citations}>
-      <article
-        className="grid scroll-mt-20 gap-x-10 lg:grid-cols-[minmax(0,1fr)_17.5rem]"
-        data-turn={question.id}
-      >
-        <div className="min-w-0 space-y-5">
-          <h2 className="font-display text-[1.65rem] leading-[1.1] text-balance sm:text-3xl">
-            {questionText(question)}
-          </h2>
+      <article className="scroll-mt-24 space-y-6" data-turn={question.id}>
+        <h2 className="font-display text-[clamp(1.9rem,4.2vw,2.75rem)] leading-[1.05] text-balance">
+          {questionText(question)}
+        </h2>
 
-          <ResearchLog parts={toolParts} working={working} />
+        <ResearchLog parts={toolParts} working={working} />
 
-          {text && <Answer markdown={markdown} streaming={working} />}
+        <SourceStrip order={order} />
 
-          <Exhibits parts={toolParts} />
+        {text && <Answer markdown={markdown} streaming={working} />}
 
-          {error && (
-            <div className="flex items-start gap-2 rounded-md border border-redline/30 bg-redline-wash px-3 py-2 text-sm text-redline">
-              <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-              <span className="flex-1">{error}</span>
-              {onRetry && (
-                <button
-                  type="button"
-                  onClick={onRetry}
-                  className="inline-flex items-center gap-1 font-medium"
-                >
-                  <RotateCcw className="size-3.5" /> Try again
-                </button>
-              )}
-            </div>
-          )}
+        <Exhibits parts={toolParts} />
 
-          {hasSources && (
-            <Collapsible className="lg:hidden">
-              <CollapsibleTrigger className="font-mono text-[0.72rem] text-graphite hover:text-foreground">
-                Show {citations.size} sources
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pt-2">
-                <SourceNotes order={order} />
-              </CollapsibleContent>
-            </Collapsible>
-          )}
-
-          {suggestions.length > 0 && !working && (
-            <nav aria-label="Follow-up questions" className="border-t pt-4">
-              <div className="mb-1.5 font-mono text-[0.68rem] text-graphite uppercase tracking-wider">
-                Keep digging
-              </div>
-              <ul>
-                {suggestions.map((s) => (
-                  <li key={s}>
-                    <button
-                      type="button"
-                      onClick={() => onAsk(s)}
-                      className="group flex w-full items-start gap-2 rounded-md py-1.5 text-left text-[0.95rem] hover:text-amber-ink"
-                    >
-                      <CornerDownRight className="mt-1 size-3.5 shrink-0 text-graphite group-hover:text-amber-ink" />
-                      {s}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          )}
-        </div>
-
-        {hasSources && (
-          <div className="hidden lg:block">
-            <SourceNotes
-              anchored
-              order={order}
-              className="sticky top-20 max-h-[calc(100dvh-7rem)] overflow-y-auto pb-4"
-            />
+        {error && (
+          <div className="flex items-start gap-2 rounded-2xl bg-redline-wash px-4 py-3 text-sm text-redline">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+            <span className="flex-1">{error}</span>
+            {onRetry && (
+              <button type="button" onClick={onRetry} className="inline-flex items-center gap-1 font-medium">
+                <RotateCcw className="size-3.5" /> Try again
+              </button>
+            )}
           </div>
+        )}
+
+        {suggestions.length > 0 && !working && (
+          <nav aria-label="Related questions" className="pt-2">
+            <div className="mb-1 font-display text-xl">Related</div>
+            <ul className="divide-y divide-rule border-y border-rule">
+              {suggestions.map((s) => (
+                <li key={s}>
+                  <button
+                    type="button"
+                    onClick={() => onAsk(s)}
+                    className="group flex w-full items-center gap-3 py-3 text-left text-[0.95rem] transition-colors hover:text-navy-ink"
+                  >
+                    <span className="flex-1">{s}</span>
+                    <Plus className="size-4 shrink-0 text-graphite transition-transform group-hover:rotate-90 group-hover:text-navy-ink" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
         )}
       </article>
     </CitationProvider>

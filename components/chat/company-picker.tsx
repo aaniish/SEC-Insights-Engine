@@ -2,7 +2,6 @@
 
 import { Building2, Check } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -70,13 +69,20 @@ export function CompanyPicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-1.5 text-graphite hover:text-foreground">
+        <button
+          type="button"
+          className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-graphite transition-colors hover:bg-muted hover:text-ink aria-expanded:bg-muted aria-expanded:text-ink"
+        >
           <Building2 className="size-3.5" />
           {selected.length === 0 ? "Pick companies" : "Companies"}
-        </Button>
+        </button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-[min(24rem,calc(100vw-2rem))] p-0">
-        <Command shouldFilter={false}>
+      <PopoverContent
+        align="start"
+        sideOffset={10}
+        className="glass glass-dense w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border-0 p-0 ring-0"
+      >
+        <Command shouldFilter={false} className="bg-transparent">
           <CommandInput
             value={query}
             onValueChange={setQuery}
@@ -93,22 +99,27 @@ export function CompanyPicker({
                     value={company.ticker}
                     disabled={isFull && !isSelected}
                     onSelect={() => onToggle({ ticker: company.ticker, name: company.name })}
-                    className="gap-3"
+                    className="gap-3 rounded-xl"
                   >
-                    <span className="w-14 shrink-0 font-mono text-xs font-medium">{company.ticker}</span>
+                    <span className="w-14 shrink-0 text-xs font-semibold tabular">{company.ticker}</span>
                     <span className="min-w-0 flex-1 truncate">{company.name}</span>
                     {company.indexed ? (
-                      <span className="shrink-0 font-mono text-[0.65rem] text-graphite">indexed</span>
+                      <span className="shrink-0 text-[0.7rem] text-graphite">Indexed</span>
                     ) : (
-                      <span className="shrink-0 font-mono text-[0.65rem] text-amber-ink">on demand</span>
+                      <span className="shrink-0 text-[0.7rem] text-navy-ink">On demand</span>
                     )}
-                    <Check className={cn("size-3.5 shrink-0", isSelected ? "opacity-100" : "opacity-0")} />
+                    <Check
+                      className={cn(
+                        "size-3.5 shrink-0 text-navy-ink",
+                        isSelected ? "opacity-100" : "opacity-0",
+                      )}
+                    />
                   </CommandItem>
                 );
               })}
             </CommandGroup>
           </CommandList>
-          <p className="border-t px-3 py-2 text-[0.72rem] leading-snug text-graphite">
+          <p className="border-t px-3 py-2.5 text-[0.72rem] leading-snug text-graphite">
             Up to {MAX_COMPANIES} companies. “On demand” filings are downloaded and indexed the first time you
             ask (about 20 seconds).
           </p>

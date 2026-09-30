@@ -48,7 +48,6 @@ export function ChatApp() {
   const turns = toTurns(messages);
   const lastTurnId = turns.at(-1)?.question.id;
 
-  // Bring each new question to the top of the viewport; the answer streams in below it.
   useEffect(() => {
     const prefetch = () => void loadTurn();
     if ("requestIdleCallback" in window) {
@@ -59,6 +58,7 @@ export function ChatApp() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Bring each new question to the top of the viewport; the answer streams in below it.
   const turnCount = turns.length;
   useEffect(() => {
     if (!lastTurnId) return;
@@ -128,13 +128,13 @@ export function ChatApp() {
   );
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex flex-1 flex-col">
       <SiteHeader onNewQuestion={messages.length > 0 ? reset : undefined} />
       {turns.length === 0 ? (
         <Home composer={composer("hero")} onFeatured={openFeatured} onPickCompany={toggleCompany} />
       ) : (
         <>
-          <main className="mx-auto w-full max-w-6xl flex-1 space-y-16 px-4 pt-8 pb-40 sm:px-6">
+          <main className="mx-auto w-full max-w-3xl flex-1 space-y-20 px-4 pt-10 pb-48 sm:px-6">
             {turns.map((turn, i) => {
               const isLast = i === turns.length - 1;
               return (
@@ -150,10 +150,8 @@ export function ChatApp() {
               );
             })}
           </main>
-          <div className="sticky bottom-0 z-20 bg-gradient-to-t from-paper via-paper/95 to-transparent pt-8 pb-4">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6">
-              <div className="max-w-[calc(100%-19.5rem)] max-lg:max-w-none">{composer("dock")}</div>
-            </div>
+          <div className="pointer-events-none sticky bottom-0 z-20 bg-gradient-to-t from-paper via-paper/70 to-transparent px-3 pt-10 pb-3 sm:px-6 sm:pb-5">
+            <div className="pointer-events-auto mx-auto max-w-3xl">{composer("dock")}</div>
           </div>
         </>
       )}

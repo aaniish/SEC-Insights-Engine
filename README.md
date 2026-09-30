@@ -4,22 +4,26 @@
 
 **Live demo: [sec-insights-engine.vercel.app](https://sec-insights-engine.vercel.app)**
 
-![Cited answer with margin sources](docs/screenshots/answer.jpg)
+![Home: ask any question about a public company](docs/screenshots/home.jpg)
 
 An agentic research assistant over SEC EDGAR. It decides per question whether to search filing text, pull structured financials, index a company it hasn't seen yet, or diff two annual reports, and streams its work as it goes.
 
 ## What it does
 
-- **Cited answers.** Every claim links to the filing passage it came from. Hover a `[n]` marker to preview it; click through to sec.gov, where a text fragment scrolls the filing to that passage.
+- **Cited answers.** Every claim links to the filing passage it came from. Source cards sit above the answer; hover a citation pill to preview the passage, then click through to sec.gov, where a text fragment scrolls the filing to that passage.
 - **Real numbers, charted.** Revenue, margins, EPS, cash flow, R&D, buybacks, and more come from SEC XBRL data rather than from the model. Values are normalized across concept changes and restatements, and quarters are derived from year-to-date filings.
 - **Any public company.** Search all ~8,000 SEC filers. Companies that aren't indexed yet get their latest 10-K downloaded, parsed, and embedded on the fly (~15 s), with progress streamed into the answer.
 - **"What changed?"** Compares Risk Factors or MD&A across two annual reports and renders the result as a legal-style redline: new, removed, and reworded paragraphs, with the material changes summarized.
 - **Live research log.** Each search, data pull, and indexing step appears as it happens.
 
+![Cited answer with source cards](docs/screenshots/answer.jpg)
+
 <table><tr>
-<td><img src="docs/screenshots/charts.jpg" alt="XBRL charts comparing NVIDIA and AMD"></td>
-<td><img src="docs/screenshots/diff.jpg" alt="Redline of Tesla's risk factor changes"></td>
+<td><img src="docs/screenshots/charts.jpg" alt="XBRL charts comparing NVIDIA and AMD (dark mode)"></td>
+<td><img src="docs/screenshots/diff.jpg" alt="Redline of Tesla's risk factor changes (dark mode)"></td>
 </tr></table>
+
+**Design.** The layout follows Perplexity: sources first, a streamed answer, and related questions. Typography takes after America.gov, with a tight display serif (Newsreader) over a clean sans (Inter). Surfaces are Apple-style "liquid glass", frosted panels floating over a soft ambient gradient, and the page has light and dark themes.
 
 ## Architecture
 
@@ -84,7 +88,7 @@ Models are environment variables, so any AI Gateway model can be swapped in. **D
 
 ## Stack
 
-Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · AI SDK 7 · Vercel AI Gateway · Neon Postgres + pgvector · Drizzle ORM · Tailwind CSS 4 · shadcn/ui · Recharts · Streamdown · Vitest · Biome
+Next.js 16 (App Router, Turbopack) · React 19 · TypeScript · AI SDK 7 · Vercel AI Gateway · Neon Postgres + pgvector · Drizzle ORM · Tailwind CSS 4 · shadcn/ui · Recharts · Streamdown · Vitest · Biome · Newsreader + Inter
 
 ## Run it locally
 
@@ -117,7 +121,7 @@ pnpm dev
 app/api/chat           agent route: tools, streaming, follow-up suggestions, rate limits
 app/api/cron/refresh   daily: new filings for curated companies, ticker refresh
 components/chat        home, composer, turns, research log, company picker
-components/citations   inline markers + margin notes
+components/citations   citation pills + source cards
 components/charts      XBRL small-multiple charts
 components/diff        redline card
 lib/sec                EDGAR client, HTML→text, section splitter, chunker, XBRL normalizer

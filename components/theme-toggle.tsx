@@ -2,7 +2,6 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 /** The theme is unknown during server render, so the label stays static and icons swap via CSS. */
@@ -11,15 +10,15 @@ export function ThemeToggle() {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
+        <button
+          type="button"
           onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
           aria-label="Toggle light and dark theme"
+          className="grid size-9 place-items-center rounded-full text-graphite transition-colors hover:bg-muted hover:text-ink"
         >
           <Sun className="size-4 dark:hidden" />
           <Moon className="hidden size-4 dark:block" />
-        </Button>
+        </button>
       </TooltipTrigger>
       <TooltipContent>Toggle theme</TooltipContent>
     </Tooltip>
