@@ -145,7 +145,17 @@ export function createTools(context: ToolContext) {
           period === "annual" ? "FY" : "Q",
           periods,
         );
-        return { period, series, missing, source: "SEC XBRL (companyfacts)" };
+        // Not every company reports every metric (e.g. no gross profit for restaurants or banks).
+        const unavailable = series
+          .filter((s) => s.points.length === 0)
+          .map((s) => `${s.ticker} ${s.label.toLowerCase()}`);
+        return {
+          period,
+          series: series.filter((s) => s.points.length > 0),
+          missing,
+          unavailable,
+          source: "SEC XBRL (companyfacts)",
+        };
       },
     }),
 

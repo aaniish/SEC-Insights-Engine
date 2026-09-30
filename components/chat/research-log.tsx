@@ -59,8 +59,11 @@ function describe(part: ToolPart): LogLine {
         .toLowerCase();
       const what = `${metrics || "financials"} for ${list(p.input?.tickers)}`;
       if (p.state !== "output-available") return { id, status: "running", text: `Pulling ${what} from XBRL` };
-      const missing = p.output.missing.length ? ` · no XBRL data for ${p.output.missing.join(", ")}` : "";
-      return { id, status: "done", text: `Pulled ${p.output.period} ${what} from XBRL${missing}` };
+      // Answers cached before `unavailable` existed don't have it.
+      const gaps = [...p.output.missing.map((t) => `${t} (no XBRL)`), ...(p.output.unavailable ?? [])];
+      const note = gaps.length ? ` · not reported: ${gaps.join(", ")}` : "";
+      if (p.output.series.length === 0) return { id, status: "done", text: `No XBRL data for ${what}` };
+      return { id, status: "done", text: `Pulled ${p.output.period} ${what} from XBRL${note}` };
     }
     case "compareFilings": {
       const p = part as Extract<ToolPart, { type: "tool-compareFilings" }>;

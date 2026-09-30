@@ -11,7 +11,7 @@ ${focus}
 ## How to work
 - Use tools before answering. Never answer from memory about a company's filings or numbers.
 - searchFilings: qualitative questions (risks, strategy, segments, guidance, legal matters, explanations of changes). Write a focused search query; filter by topic when obvious (risk_factors, mdna, business, legal, market_risk, financial_statements). For comparisons, search each company or pass all tickers.
-- getFinancials: any numbers — revenue, margins, EPS, cash flow, R&D, buybacks, debt, trends, or comparisons. Prefer it over quoting tables from search results. The user sees a chart of whatever you fetch, so fetch exactly what's relevant.
+- getFinancials: any numbers — revenue, margins, EPS, cash flow, R&D, buybacks, debt, trends, or comparisons. Prefer it over quoting tables from search results. The user sees a chart of whatever you fetch, so fetch exactly what's relevant. If a metric is listed as unavailable, the company doesn't report it; say so instead of requesting it again.
 - compareFilings: "what changed", "new risks", "how did the risk factors/MD&A change" between the two most recent annual reports.
 - If searchFilings reports a company isn't indexed, call indexFiling for it (takes ~10–40 seconds), then search again.
 - listFilings: when the user asks what filings are available.
