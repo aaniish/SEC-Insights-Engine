@@ -3,14 +3,20 @@ import { ThemeToggle } from "@/components/theme-toggle";
 
 const REPO_URL = "https://github.com/aaniish/SEC-Insights-Engine";
 
-/** Glossy navy disc with the section sign, the mark used to cite parts of a filing. */
-export function Mark({ className = "size-7 text-[0.95rem]" }: { className?: string }) {
+/** The logo: a glossy navy disc with a rising line chart. */
+export function Mark({ className = "size-8" }: { className?: string }) {
   return (
-    <span
-      aria-hidden="true"
-      className={`gloss grid shrink-0 place-items-center rounded-full font-serif ${className}`}
-    >
-      §
+    <span aria-hidden="true" className={`gloss grid shrink-0 place-items-center rounded-full ${className}`}>
+      <svg viewBox="0 0 24 24" className="size-[60%]" fill="none">
+        <path
+          d="M4.5 16.5 9.5 11.5 13 14 19 7.5"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx="19" cy="7.5" r="2.1" fill="currentColor" />
+      </svg>
     </span>
   );
 }
