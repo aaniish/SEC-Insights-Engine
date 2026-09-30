@@ -2,6 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
@@ -12,7 +13,11 @@ import { CURATED_COMPANIES, type FeaturedQuestion } from "@/lib/featured";
 import { MAX_COMPANIES, type PickedCompany } from "./company-picker";
 import { Composer } from "./composer";
 import { Home } from "./home";
-import { Turn } from "./turn";
+
+// The answer view pulls in the markdown renderer, charts, and diff library; keep it
+// out of the home page bundle and prefetch it while the visitor reads the page.
+const loadTurn = () => import("./turn").then((m) => m.Turn);
+const Turn = dynamic(loadTurn, { ssr: false });
 
 /** API errors arrive as the raw response body; surface the message inside it. */
 function readableError(error: Error): string {
@@ -44,6 +49,16 @@ export function ChatApp() {
   const lastTurnId = turns.at(-1)?.question.id;
 
   // Bring each new question to the top of the viewport; the answer streams in below it.
+  useEffect(() => {
+    const prefetch = () => void loadTurn();
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(prefetch);
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(prefetch, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   const turnCount = turns.length;
   useEffect(() => {
     if (!lastTurnId) return;

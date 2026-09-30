@@ -2,6 +2,8 @@
 
 **Ask a question about any US public company. Get an answer cited to the exact passage in its 10-K or 10-Q, with reported financials charted straight from XBRL.**
 
+**Live demo: [sec-insights-engine.vercel.app](https://sec-insights-engine.vercel.app)**
+
 ![Cited answer with margin sources](docs/screenshots/answer.jpg)
 
 An agentic research assistant over SEC EDGAR. It decides per question whether to search filing text, pull structured financials, index a company it hasn't seen yet, or diff two annual reports, and streams its work as it goes.
