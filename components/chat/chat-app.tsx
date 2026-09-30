@@ -17,7 +17,20 @@ import { Home } from "./home";
 // The answer view pulls in the markdown renderer, charts, and diff library; keep it
 // out of the home page bundle and prefetch it while the visitor reads the page.
 const loadTurn = () => import("./turn").then((m) => m.Turn);
-const Turn = dynamic(loadTurn, { ssr: false });
+const Turn = dynamic(loadTurn, {
+  ssr: false,
+  loading: () => (
+    <div className="animate-pulse space-y-5" aria-hidden="true">
+      <div className="h-10 w-3/4 rounded-xl bg-muted" />
+      <div className="h-7 w-40 rounded-full bg-muted" />
+      <div className="space-y-2.5">
+        <div className="h-4 rounded bg-muted" />
+        <div className="h-4 w-11/12 rounded bg-muted" />
+        <div className="h-4 w-4/5 rounded bg-muted" />
+      </div>
+    </div>
+  ),
+});
 
 /** API errors arrive as the raw response body; surface the message inside it. */
 function readableError(error: Error): string {
