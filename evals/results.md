@@ -9,24 +9,24 @@ Model: `openai/gpt-6-luna` · 2026-09-30 · 17 cases
 | Citation validity | 100% (10/10) |
 | Numeric accuracy (vs XBRL) | 100% (6/6) |
 | Faithfulness (LLM judge) | 91% |
-| Median latency | 9.6s |
+| Median latency | 12.1s |
 
 | Case | Tool | Retrieval | Citations | Numbers | Faithful | Time |
 |---|---|---|---|---|---|---|
-| aapl-single-source | ✓ | ✓ | ✓ | – | 100% | 11.3s |
-| nflx-competition | ✓ | ✓ | ✓ | – | 100% | 9.9s |
-| meta-legal | ✓ | ✓ | ✓ | – | 100% | 12.4s |
-| cost-membership | ✓ | ✓ | ✓ | – | 100% | 11.3s |
-| wmt-tariffs | ✓ | ✓ | ✓ | – | 100% | 8.8s |
-| jpm-allowance | ✓ | ✓ | ✓ | – | 75% | 11.3s |
-| amzn-aws | ✓ | ✓ | ✓ | – | 100% | 8.1s |
-| amd-export | ✓ | ✓ | ✓ | – | 100% | 11.8s |
-| googl-revenue-sources | ✓ | ✓ | ✓ | – | 50% | 13.9s |
-| msft-cyber | ✓ | ✓ | ✓ | – | 86% | 11.0s |
-| aapl-revenue-fy25 | ✓ | – | – | ✓ | – | 5.5s |
-| tsla-revenue-fy24 | ✓ | – | – | ✓ | – | 5.7s |
-| nvda-revenue-fy25 | ✓ | – | – | ✓ | – | 9.6s |
-| jpm-net-income-fy24 | ✓ | – | – | ✓ | – | 3.9s |
+| aapl-single-source | ✓ | ✓ | ✓ | – | 67% | 18.2s |
+| nflx-competition | ✓ | ✓ | ✓ | – | 100% | 13.8s |
+| meta-legal | ✓ | ✓ | ✓ | – | 67% | 21.0s |
+| cost-membership | ✓ | ✓ | ✓ | – | 100% | 14.1s |
+| wmt-tariffs | ✓ | ✓ | ✓ | – | 100% | 12.5s |
+| jpm-allowance | ✓ | ✓ | ✓ | – | 100% | 26.5s |
+| amzn-aws | ✓ | ✓ | ✓ | – | 100% | 9.7s |
+| amd-export | ✓ | ✓ | ✓ | – | 100% | 12.4s |
+| googl-revenue-sources | ✓ | ✓ | ✓ | – | 80% | 14.5s |
+| msft-cyber | ✓ | ✓ | ✓ | – | 100% | 12.1s |
+| aapl-revenue-fy25 | ✓ | – | – | ✓ | – | 5.1s |
+| tsla-revenue-fy24 | ✓ | – | – | ✓ | – | 5.3s |
+| nvda-revenue-fy25 | ✓ | – | – | ✓ | – | 6.7s |
+| jpm-net-income-fy24 | ✓ | – | – | ✓ | – | 6.6s |
 | aapl-eps-fy25 | ✓ | – | – | ✓ | – | 4.0s |
-| meta-margin-fy25 | ✓ | – | – | ✓ | – | 7.7s |
-| tsla-new-risks | ✓ | – | – | – | – | 7.9s |
+| meta-margin-fy25 | ✓ | – | – | ✓ | – | 5.9s |
+| tsla-new-risks | ✓ | – | – | – | – | 8.9s |

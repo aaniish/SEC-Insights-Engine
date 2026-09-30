@@ -1,12 +1,20 @@
+<div align="center">
+
+<img src="docs/logo.svg" width="72" height="72" alt="SEC Insights logo">
+
 # SEC Insights
 
-**Ask a question about any US public company. Get an answer cited to the exact passage in its 10-K or 10-Q, with reported financials charted straight from XBRL.**
+**Ask anything about a US public company. Get an answer cited to the exact passage in its 10-K or 10-Q, with reported financials charted straight from XBRL.**
 
-**Live demo: [sec-insights-engine.vercel.app](https://sec-insights-engine.vercel.app)**
+[**Live demo →**](https://sec-insights-engine.vercel.app) &nbsp;·&nbsp; [How it works](#architecture) &nbsp;·&nbsp; [Evals](#quality) &nbsp;·&nbsp; [Run locally](#run-it-locally)
 
-![Home: ask any question about a public company](docs/screenshots/home.jpg)
+<img src="docs/demo.gif" alt="Demo: asking about Nike indexes its 10-K on the fly, then answers with cited passages and XBRL margin charts; a filing diff shows what changed in Tesla's risk factors" width="100%">
 
-An agentic research assistant over SEC EDGAR. It decides per question whether to search filing text, pull structured financials, index a company it hasn't seen yet, or diff two annual reports, and streams its work as it goes.
+</div>
+
+In the demo above, **Nike wasn't indexed**. The agent pulls its margins from XBRL, notices the 10-K isn't searchable, then downloads, parses, and embeds it (~15 s). It searches the fresh index and answers with cited passages and charts. It even says which metric Nike doesn't report. The last clip is the **filing diff**, showing what changed in Tesla's risk factors year over year.
+
+An agentic research assistant over SEC EDGAR. For each question it decides whether to search filing text, pull structured financials, index a company it hasn't seen yet, or diff two annual reports, and it streams each step as it goes.
 
 ## What it does
 
@@ -16,9 +24,10 @@ An agentic research assistant over SEC EDGAR. It decides per question whether to
 - **"What changed?"** Compares Risk Factors or MD&A across two annual reports and renders the result as a legal-style redline: new, removed, and reworded paragraphs, with the material changes summarized.
 - **Live research log.** Each search, data pull, and indexing step appears as it happens.
 
-![Cited answer with source cards](docs/screenshots/answer.jpg)
-
 <table><tr>
+<td><img src="docs/screenshots/home.jpg" alt="Home page"></td>
+<td><img src="docs/screenshots/answer.jpg" alt="Cited answer with source cards"></td>
+</tr><tr>
 <td><img src="docs/screenshots/charts.jpg" alt="XBRL charts comparing NVIDIA and AMD (dark mode)"></td>
 <td><img src="docs/screenshots/diff.jpg" alt="Redline of Tesla's risk factor changes (dark mode)"></td>
 </tr></table>
@@ -55,11 +64,12 @@ flowchart LR
 | **Hybrid retrieval** | Vector search (512-dim `halfvec`; exact scan when filtered to a few companies, HNSW otherwise) plus Postgres full-text search with OR'd terms, fused with Reciprocal Rank Fusion. Multi-company questions are interleaved so each company gets passages. |
 | **XBRL normalizer** | Merges concept fallbacks (e.g. `Revenues` → `RevenueFromContract…` → `RevenuesNetOfInterestExpense` for banks). The latest restatement wins, and each period is labeled by the filing that first reported it. Q4 and quarterly cash flows are derived from YTD values; per-share metrics are never derived. |
 | **Filing diff** | Exact-match paragraphs are paired first (ignoring years). The rest are embedded and greedily matched by cosine similarity. Trivial edits count as unchanged; low-overlap matches are split into removed + added. The fast model summarizes the material changes, and results are cached. |
+| **Fiscal labels** | Companies name 52/53-week fiscal years differently (Walmart by the year a fiscal year ends, Domino's by the year it mostly covers). Each filing's label comes from the fiscal year and period the company itself tagged in XBRL, with date math only as a fallback. |
 | **Guardrails** | Per-visitor and global daily limits in Postgres, prepaid AI Gateway credits as a hard spend ceiling, and starter questions replayed from cache at zero cost. Storage is kept under the free tier with LRU eviction of on-demand companies. |
 
 ## Quality
 
-`pnpm eval` runs 17 questions end-to-end through the production route:
+`pnpm eval` runs 17 questions end-to-end through the chat route handler (the same code production serves):
 
 | Metric | Score |
 |---|---|
@@ -68,9 +78,9 @@ flowchart LR
 | Citation validity (every `[n]` exists) | 100% (10/10) |
 | Numeric accuracy vs XBRL (±1%) | 100% (6/6) |
 | Faithfulness (LLM judge, cited claims supported) | 91% |
-| Median latency | 9.6 s |
+| Median latency (full agent loop, incl. follow-up suggestions) | 12.1 s |
 
-Full per-case results are in [`evals/results.md`](evals/results.md). There are also 40 unit tests covering the parser, chunker, fiscal-period math, XBRL normalization, fusion, diff alignment, and citation handling, plus live tests that parse real Apple, Tesla, and JPMorgan 10-Ks from EDGAR.
+Full per-case results are in [`evals/results.md`](evals/results.md). There are also 42 unit tests covering the parser, chunker, fiscal-period math, XBRL normalization, fusion, diff alignment, and citation handling, plus live tests that parse real Apple, Tesla, and JPMorgan 10-Ks from EDGAR.
 
 ## Cost
 
