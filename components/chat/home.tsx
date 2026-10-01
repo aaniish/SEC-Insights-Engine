@@ -1,25 +1,10 @@
 "use client";
 
-import { ArrowRight, ArrowUpRight, ChartLine, FileText, Quote } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { CURATED_COMPANIES, FEATURED_QUESTIONS, type FeaturedQuestion } from "@/lib/featured";
-import { cn } from "@/lib/utils";
 import type { PickedCompany } from "./company-picker";
-
-/** A small glass (or glossy navy) disc set inline with display text. */
-function Bubble({ children, solid = false }: { children: ReactNode; solid?: boolean }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={cn(
-        "mx-[0.08em] inline-grid size-[0.95em] translate-y-[-0.06em] place-items-center rounded-full align-middle [&_svg]:size-[0.42em]",
-        solid ? "gloss" : "glass text-navy-ink",
-      )}
-    >
-      {children}
-    </span>
-  );
-}
+import { DriftStatement } from "./drift-statement";
 
 export function Home({
   composer,
@@ -86,28 +71,9 @@ export function Home({
         </div>
       </section>
 
-      <section aria-label="How it works" className="mx-auto mt-28 max-w-4xl">
-        <p className="text-center font-display text-[clamp(2.1rem,5.6vw,4.4rem)] leading-[1.04] text-balance">
-          SEC Insights
-          <Bubble solid>
-            <ArrowRight />
-          </Bubble>
-          reads <span className="whitespace-nowrap">10-Ks</span> and{" "}
-          <span className="whitespace-nowrap">10-Qs</span>
-          <Bubble>
-            <FileText />
-          </Bubble>
-          and answers with the exact passage
-          <Bubble>
-            <Quote />
-          </Bubble>
-          behind every claim, plus the numbers
-          <Bubble>
-            <ChartLine />
-          </Bubble>
-          straight from XBRL.
-        </p>
-        <p className="mx-auto mt-8 max-w-xl text-center text-sm leading-relaxed text-graphite">
+      <section aria-label="How it works" className="mt-32">
+        <DriftStatement />
+        <p className="mx-auto mt-10 max-w-xl text-center text-sm leading-relaxed text-graphite">
           Built on SEC EDGAR. Filing text is searched with hybrid semantic and keyword retrieval; financials
           come from the XBRL data companies file with every report. Not investment advice.
         </p>

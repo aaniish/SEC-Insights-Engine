@@ -294,6 +294,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Home statement: --drift (-1 to 1) follows the scroll position, --lane sets each line's direction. */
+.drift-line {
+  transform: translate3d(calc(var(--drift, 0) * var(--lane, 1) * 42vw), 0, 0);
+  opacity: var(--fade, 1);
+  will-change: transform;
+}
+
 @keyframes log-in {
   from {
     opacity: 0;
