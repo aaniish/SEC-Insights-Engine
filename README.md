@@ -66,6 +66,7 @@ flowchart LR
 | **Filing diff** | Exact-match paragraphs are paired first (ignoring years). The rest are embedded and greedily matched by cosine similarity. Trivial edits count as unchanged; low-overlap matches are split into removed + added. The fast model summarizes the material changes, and results are cached. |
 | **Fiscal labels** | Companies name 52/53-week fiscal years differently (Walmart by the year a fiscal year ends, Domino's by the year it mostly covers). Each filing's label comes from the fiscal year and period the company itself tagged in XBRL, with date math only as a fallback. |
 | **Guardrails** | Per-visitor and global daily limits in Postgres, prepaid AI Gateway credits as a hard spend ceiling, and starter questions replayed from cache at zero cost. Storage is kept under the free tier with LRU eviction of on-demand companies. |
+| **Prompt-injection defenses** | The server rebuilds the conversation as plain user/assistant text, so clients can't inject system messages or fake tool results, and questions are length-capped. The agent declines off-topic requests and treats filing text as data, not instructions. Its tools only read public SEC data, and answers render with no raw HTML, no images, and no links outside sec.gov. |
 
 ## Quality
 
