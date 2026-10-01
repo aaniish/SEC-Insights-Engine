@@ -6,7 +6,7 @@
 
 **Ask anything about a US public company. Get an answer cited to the exact passage in its 10-K or 10-Q, with reported financials charted straight from XBRL.**
 
-[**Live demo →**](https://sec-insights-engine.vercel.app) &nbsp;·&nbsp; [How it works](#architecture) &nbsp;·&nbsp; [Evals](#quality) &nbsp;·&nbsp; [Run locally](#run-it-locally)
+[**Live demo →**](https://secinsights.app) &nbsp;·&nbsp; [How it works](#architecture) &nbsp;·&nbsp; [Evals](#quality) &nbsp;·&nbsp; [Run locally](#run-it-locally)
 
 <img src="docs/demo.gif" alt="Demo: asking about Nike indexes its 10-K on the fly, then answers with cited passages and XBRL margin charts; a filing diff shows what changed in Tesla's risk factors" width="100%">
 
