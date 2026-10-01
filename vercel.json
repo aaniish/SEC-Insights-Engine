@@ -1,5 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "crons": [{ "path": "/api/cron/refresh", "schedule": "0 11 * * *" }]
+  "crons": [{ "path": "/api/cron/refresh", "schedule": "0 11 * * *" }],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.secinsights.app" }],
+      "destination": "https://secinsights.app/:path*",
+      "permanent": true
+    }
+  ]
 }
