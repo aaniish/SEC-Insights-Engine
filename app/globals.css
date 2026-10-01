@@ -257,7 +257,7 @@
   }
 }
 
-/* Answers read in the UI sans at a comfortable size, like Perplexity. */
+/* Answers read in the UI sans at a comfortable size. */
 .answer {
   font-size: 1.0625rem;
   line-height: 1.72;

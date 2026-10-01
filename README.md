@@ -32,7 +32,7 @@ An agentic research assistant over SEC EDGAR. For each question it decides wheth
 <td><img src="docs/screenshots/diff.jpg" alt="Redline of Tesla's risk factor changes (dark mode)"></td>
 </tr></table>
 
-**Design.** The layout follows Perplexity: sources first, a streamed answer, and related questions. Type is a tight display serif (Newsreader, upright and italic) over a clean sans (Inter); on the home page, the four lines of the feature statement slide in from alternating sides and lock into place as you scroll. Surfaces are Apple-style "liquid glass", frosted panels floating over a soft ambient gradient, and the page has light and dark themes.
+**Design.** Newsreader and Inter, light and dark themes, and a chart palette checked for color-blind contrast in both.
 
 ## Architecture
 

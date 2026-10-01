@@ -104,7 +104,7 @@ export function CitationMarker({ n }: { n: number }) {
   );
 }
 
-/** Source cards above the answer (Perplexity-style): cited passages first, the rest on request. */
+/** Source cards above the answer: cited passages first, the rest on request. */
 export function SourceStrip({ order }: { order: number[] }) {
   const { turnId, citations, active, setActive } = useCitations();
   const [showAll, setShowAll] = useState(false);
