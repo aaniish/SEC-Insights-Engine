@@ -1,0 +1,125 @@
+[
+  {
+    "id": "aapl-single-source",
+    "question": "What does Apple say about relying on single-source suppliers?",
+    "tickers": ["AAPL"],
+    "tool": "searchFilings",
+    "topic": "risk_factors",
+    "keywords": ["single", "sole"]
+  },
+  {
+    "id": "nflx-competition",
+    "question": "How does Netflix describe competition for members' viewing time?",
+    "tickers": ["NFLX"],
+    "tool": "searchFilings",
+    "keywords": ["compet"]
+  },
+  {
+    "id": "meta-legal",
+    "question": "What major legal proceedings does Meta disclose?",
+    "tickers": ["META"],
+    "tool": "searchFilings",
+    "topic": "legal",
+    "keywords": ["litigation", "lawsuit", "complaint", "FTC", "proceeding"]
+  },
+  {
+    "id": "cost-membership",
+    "question": "How did Costco's membership fee income change and why?",
+    "tickers": ["COST"],
+    "tool": "searchFilings",
+    "topic": "mdna",
+    "keywords": ["membership fee"]
+  },
+  {
+    "id": "wmt-tariffs",
+    "question": "What does Walmart say about the risk of tariffs?",
+    "tickers": ["WMT"],
+    "tool": "searchFilings",
+    "keywords": ["tariff"]
+  },
+  {
+    "id": "jpm-allowance",
+    "question": "What drove changes in JPMorgan's allowance for credit losses?",
+    "tickers": ["JPM"],
+    "tool": "searchFilings",
+    "topic": "mdna",
+    "keywords": ["allowance"]
+  },
+  {
+    "id": "amzn-aws",
+    "question": "What does Amazon say drove AWS sales growth?",
+    "tickers": ["AMZN"],
+    "tool": "searchFilings",
+    "topic": "mdna",
+    "keywords": ["AWS"]
+  },
+  {
+    "id": "amd-export",
+    "question": "How do US export controls affect AMD's business in China?",
+    "tickers": ["AMD"],
+    "tool": "searchFilings",
+    "keywords": ["export"]
+  },
+  {
+    "id": "googl-revenue-sources",
+    "question": "What are Alphabet's main sources of revenue?",
+    "tickers": ["GOOGL"],
+    "tool": "searchFilings",
+    "keywords": ["advertising"]
+  },
+  {
+    "id": "msft-cyber",
+    "question": "What cybersecurity risks does Microsoft disclose?",
+    "tickers": ["MSFT"],
+    "tool": "searchFilings",
+    "keywords": ["cyber", "security"]
+  },
+  {
+    "id": "aapl-revenue-fy25",
+    "question": "What was Apple's revenue in fiscal 2025?",
+    "tickers": ["AAPL"],
+    "tool": "getFinancials",
+    "facts": [{ "ticker": "AAPL", "metric": "revenue", "fiscalYear": 2025 }]
+  },
+  {
+    "id": "tsla-revenue-fy24",
+    "question": "How much revenue did Tesla report for 2024?",
+    "tickers": ["TSLA"],
+    "tool": "getFinancials",
+    "facts": [{ "ticker": "TSLA", "metric": "revenue", "fiscalYear": 2024 }]
+  },
+  {
+    "id": "nvda-revenue-fy25",
+    "question": "What was NVIDIA's revenue in fiscal year 2025?",
+    "tickers": ["NVDA"],
+    "tool": "getFinancials",
+    "facts": [{ "ticker": "NVDA", "metric": "revenue", "fiscalYear": 2025 }]
+  },
+  {
+    "id": "jpm-net-income-fy24",
+    "question": "What was JPMorgan's net income in 2024?",
+    "tickers": ["JPM"],
+    "tool": "getFinancials",
+    "facts": [{ "ticker": "JPM", "metric": "netIncome", "fiscalYear": 2024 }]
+  },
+  {
+    "id": "aapl-eps-fy25",
+    "question": "What was Apple's diluted EPS for fiscal 2025?",
+    "tickers": ["AAPL"],
+    "tool": "getFinancials",
+    "facts": [{ "ticker": "AAPL", "metric": "epsDiluted", "fiscalYear": 2025 }]
+  },
+  {
+    "id": "meta-margin-fy25",
+    "question": "What was Meta's operating margin in 2025?",
+    "tickers": ["META"],
+    "tool": "getFinancials",
+    "facts": [{ "ticker": "META", "metric": "operatingMargin", "fiscalYear": 2025 }]
+  },
+  {
+    "id": "tsla-new-risks",
+    "question": "Which risk factors did Tesla add in its latest annual report?",
+    "tickers": ["TSLA"],
+    "tool": "compareFilings"
+  }
+]

@@ -1,0 +1,65 @@
+import { Plus } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+
+const REPO_URL = "https://github.com/aaniish/SEC-Insights-Engine";
+
+/** The logo: a glossy navy disc with a rising line chart. */
+export function Mark({ className = "size-8" }: { className?: string }) {
+  return (
+    <span aria-hidden="true" className={`gloss grid shrink-0 place-items-center rounded-full ${className}`}>
+      <svg viewBox="0 0 24 24" className="size-[60%]" fill="none" aria-hidden="true">
+        <path
+          d="M4.5 16.5 9.5 11.5 13 14 19 7.5"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx="19" cy="7.5" r="2.1" fill="currentColor" />
+      </svg>
+    </span>
+  );
+}
+
+export function SiteHeader({ onNewQuestion }: { onNewQuestion?: () => void }) {
+  return (
+    <header className="sticky top-0 z-30 px-3 pt-3 sm:px-6">
+      <div className="glass mx-auto flex h-14 max-w-5xl items-center gap-2 rounded-full pr-2 pl-3 sm:pl-4">
+        <button
+          type="button"
+          onClick={onNewQuestion}
+          disabled={!onNewQuestion}
+          className="flex items-center gap-2.5 rounded-full py-1 pr-2 focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          <Mark />
+          <span className="font-display text-[1.45rem] leading-none tracking-[-0.03em]">SEC Insights</span>
+        </button>
+        <div className="ml-auto flex items-center gap-1">
+          {onNewQuestion && (
+            <button
+              type="button"
+              onClick={onNewQuestion}
+              className="gloss mr-1 inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-medium transition-transform active:scale-[0.97]"
+            >
+              <Plus className="size-4" />
+              <span className="hidden sm:inline">New question</span>
+              <span className="sm:hidden">New</span>
+            </button>
+          )}
+          <ThemeToggle />
+          <a
+            href={REPO_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="grid size-9 place-items-center rounded-full text-graphite transition-colors hover:bg-muted hover:text-ink"
+          >
+            <span className="sr-only">Source code on GitHub</span>
+            <svg viewBox="0 0 16 16" className="size-4" fill="currentColor" aria-hidden="true">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+  );
+}

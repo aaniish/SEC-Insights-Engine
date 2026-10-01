@@ -1,0 +1,345 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "streamdown/styles.css";
+
+@source "../node_modules/streamdown/dist/*.js";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * A cool, airy canvas with deep-navy ink (America.gov), a single navy accent,
+ * and frosted "liquid glass" surfaces floating over a soft ambient gradient.
+ * Legal redline colors appear only in filing diffs.
+ */
+:root {
+  --frame: #ffffff;
+  --paper: #eef2f7;
+  --ink: #0a1330;
+  --graphite: #5a6478;
+  --rule: rgb(10 19 48 / 0.09);
+  --accent: #1e3a8a;
+  --accent-strong: #162d6e;
+  --accent-ink: #1e3a8a;
+  --accent-soft: rgb(30 58 138 / 0.08);
+  --redline: #b42318;
+  --redline-wash: #fbe9e6;
+  --insert: #1f55c9;
+  --insert-wash: #e7eefc;
+
+  --glass-fill: linear-gradient(180deg, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.56));
+  --glass-fill-dense: linear-gradient(180deg, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.8));
+  --glass-border: rgb(255 255 255 / 0.85);
+  --glass-edge: rgb(10 19 48 / 0.06);
+  --glass-highlight: rgb(255 255 255 / 0.95);
+  --glass-shadow: 0 1px 2px rgb(10 19 48 / 0.04), 0 14px 36px -14px rgb(10 19 48 / 0.2);
+  --ambient-1: rgb(147 197 253 / 0.45);
+  --ambient-2: rgb(196 181 253 / 0.32);
+  --ambient-3: rgb(165 243 252 / 0.3);
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: #ffffff;
+  --card-foreground: var(--ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--ink);
+  --primary: var(--accent);
+  --primary-foreground: #ffffff;
+  --secondary: rgb(10 19 48 / 0.05);
+  --secondary-foreground: var(--ink);
+  --muted: rgb(10 19 48 / 0.05);
+  --muted-foreground: var(--graphite);
+  --accent-bg: rgb(10 19 48 / 0.05);
+  --destructive: var(--redline);
+  --border: var(--rule);
+  --input: rgb(10 19 48 / 0.12);
+  --ring: rgb(30 58 138 / 0.45);
+  --radius: 0.875rem;
+
+  /* Categorical series, validated for CVD separation on the light glass surface. */
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #4a3aa7;
+  --chart-grid: rgb(10 19 48 / 0.07);
+  --chart-axis: rgb(10 19 48 / 0.16);
+}
+
+.dark {
+  --frame: #020409;
+  --paper: #080d1a;
+  --ink: #e7ebf5;
+  --graphite: #98a2b8;
+  --rule: rgb(255 255 255 / 0.08);
+  --accent: #3b5bdb;
+  --accent-strong: #2f4bc2;
+  --accent-ink: #9db4ff;
+  --accent-soft: rgb(125 156 255 / 0.14);
+  --redline: #f2776b;
+  --redline-wash: rgb(242 119 107 / 0.12);
+  --insert: #7ea6f8;
+  --insert-wash: rgb(126 166 248 / 0.12);
+
+  --glass-fill: linear-gradient(180deg, rgb(30 38 62 / 0.62), rgb(17 23 40 / 0.5));
+  --glass-fill-dense: linear-gradient(180deg, rgb(28 36 58 / 0.9), rgb(16 22 38 / 0.84));
+  --glass-border: rgb(255 255 255 / 0.1);
+  --glass-edge: rgb(0 0 0 / 0.3);
+  --glass-highlight: rgb(255 255 255 / 0.12);
+  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 18px 40px -16px rgb(0 0 0 / 0.6);
+  --ambient-1: rgb(59 91 219 / 0.28);
+  --ambient-2: rgb(124 58 237 / 0.16);
+  --ambient-3: rgb(8 145 178 / 0.16);
+
+  --card: #111827;
+  --popover: #111827;
+  --secondary: rgb(255 255 255 / 0.06);
+  --muted: rgb(255 255 255 / 0.06);
+  --accent-bg: rgb(255 255 255 / 0.07);
+  --input: rgb(255 255 255 / 0.14);
+  --ring: rgb(125 156 255 / 0.5);
+
+  --chart-1: #3987e5;
+  --chart-2: #d95926;
+  --chart-3: #199e70;
+  --chart-4: #9085e9;
+  --chart-grid: rgb(255 255 255 / 0.07);
+  --chart-axis: rgb(255 255 255 / 0.16);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent-bg);
+  --color-accent-foreground: var(--ink);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+
+  --color-frame: var(--frame);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-graphite: var(--graphite);
+  --color-rule: var(--rule);
+  --color-navy: var(--accent);
+  --color-navy-strong: var(--accent-strong);
+  --color-navy-ink: var(--accent-ink);
+  --color-navy-soft: var(--accent-soft);
+  --color-redline: var(--redline);
+  --color-redline-wash: var(--redline-wash);
+  --color-insert: var(--insert);
+  --color-insert-wash: var(--insert-wash);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+    background: var(--frame);
+  }
+  body {
+    @apply text-foreground antialiased;
+    background: var(--frame);
+    font-feature-settings: "cv11", "ss01";
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  ::selection {
+    background: var(--accent-soft);
+  }
+}
+
+/* The display serif: large, tight, deep ink (America.gov). */
+@utility font-display {
+  font-family: var(--font-newsreader), ui-serif, Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  font-optical-sizing: auto;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Liquid glass: a translucent fill with backdrop blur, a bright top edge, a faint
+ * dark hairline, and a soft drop shadow. Content behind it (the ambient gradient,
+ * scrolled text) shows through, softened.
+ */
+@utility glass {
+  /* Raw backdrop-filter declarations are dropped by the CSS pipeline; Tailwind's own utilities survive. */
+  @apply backdrop-blur-[22px] backdrop-saturate-[1.7];
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 0 0 1px var(--glass-edge),
+    var(--glass-shadow);
+}
+
+/* Denser glass for surfaces that float over text (the follow-up dock). */
+@utility glass-dense {
+  @apply backdrop-blur-[30px] backdrop-saturate-[1.8];
+  background: var(--glass-fill-dense);
+}
+
+/* Horizontal scrollers: no scrollbar, edges fade instead of cutting cards off. */
+@utility scroll-fade-x {
+  scrollbar-width: none;
+  mask-image: linear-gradient(90deg, transparent, #000 1rem, #000 calc(100% - 2.5rem), transparent);
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Solid navy control with a glossy top light, like the America.gov arrow buttons. */
+@utility gloss {
+  background: radial-gradient(120% 90% at 30% 0%, rgb(255 255 255 / 0.28), transparent 55%), var(--accent);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    inset 0 -2px 6px rgb(0 0 0 / 0.18),
+    0 8px 18px -8px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+/* The rounded canvas that holds the page, over a soft ambient wash. */
+.canvas {
+  position: relative;
+  isolation: isolate;
+  background: var(--paper);
+  overflow: clip;
+}
+.canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(45% 38% at 12% 8%, var(--ambient-1), transparent 70%),
+    radial-gradient(40% 35% at 88% 14%, var(--ambient-2), transparent 70%),
+    radial-gradient(55% 45% at 50% 105%, var(--ambient-3), transparent 70%);
+}
+@media (min-width: 768px) {
+  .canvas {
+    margin: 12px;
+    border-radius: 2.5rem;
+    min-height: calc(100dvh - 24px);
+  }
+}
+
+/* Answers read in the UI sans at a comfortable size, like Perplexity. */
+.answer {
+  font-size: 1.0625rem;
+  line-height: 1.72;
+  color: var(--ink);
+}
+.answer :where(p, ul, ol, table, div) + :where(p, ul, ol, table, h2, h3, div) {
+  margin-top: 0.9em;
+}
+.answer :where(strong) {
+  font-weight: 600;
+}
+.answer :where(ul) {
+  list-style: disc;
+  padding-left: 1.25em;
+}
+.answer :where(ol) {
+  list-style: decimal;
+  padding-left: 1.4em;
+}
+.answer :where(li) + :where(li) {
+  margin-top: 0.4em;
+}
+.answer :where(li)::marker {
+  color: var(--graphite);
+}
+.answer :where(h2, h3, h4) {
+  font-family: var(--font-newsreader), ui-serif, serif;
+  font-weight: 500;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+}
+.answer :where(table) {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Home statement: --drift (-1 to 1) follows the scroll position, --lane sets each line's direction. */
+.drift-line {
+  transform: translate3d(calc(var(--drift, 0) * var(--lane, 1) * 42vw), 0, 0);
+  opacity: var(--fade, 1);
+  will-change: transform;
+}
+
+@keyframes log-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.log-line {
+  animation: log-in 220ms ease-out both;
+}
+
+@keyframes cite-flash {
+  from {
+    box-shadow:
+      0 0 0 3px var(--accent-soft),
+      var(--glass-shadow);
+  }
+  to {
+    box-shadow:
+      0 0 0 0 transparent,
+      var(--glass-shadow);
+  }
+}
+.cite-flash {
+  animation: cite-flash 1.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .log-line,
+  .cite-flash {
+    animation: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--card);
+  }
+}
