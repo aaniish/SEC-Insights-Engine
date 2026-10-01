@@ -144,4 +144,4 @@ scripts                seed, cache-featured, eval
 
 ---
 
-This started as a take-home prototype built on FastAPI, LangChain, ChromaDB, and Docker, and was rebuilt as a single deployable Next.js app. The original is in the git history.
+This started as a prototype built on FastAPI, LangChain, ChromaDB, and Docker, and was rebuilt as a single deployable Next.js app. The original is in the git history.
